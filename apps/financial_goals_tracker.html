@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Financial Goals Tracker</title>
-    <link rel="icon" type="image/png" href="natar-dev.png">
+    <link rel="icon" type="image/png" href="../natar-dev.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -500,7 +500,7 @@
         <header class="mb-2 px-1 pt-1">
             <h1 class="flex items-center justify-between gap-2 text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900">
                 <span>Financial Goals Tracker</span>
-                <img src="natar-dev.png" alt="Natar Developer" class="h-8 w-auto md:h-10 rounded-lg border border-slate-200/80 bg-white/70 p-1 shadow-sm">
+                <img src="../natar-dev.png" alt="Natar Developer" class="h-8 w-auto md:h-10 rounded-lg border border-slate-200/80 bg-white/70 p-1 shadow-sm">
             </h1>
             <p class="text-sm md:text-base text-slate-700">
                 Ini tempat buat <b>nge-track mimpi finansial masa depan</b> tanpa drama, biar dompet tetap waras dan goals tetap gas.
@@ -541,7 +541,7 @@
                 <div class="space-y-2.5">
                     <div>
                         <label class="block text-sm font-semibold text-slate-700">Return Obligasi/Investasi (%)</label>
-                        <input type="number" id="bondReturn" value="5.5" class="modern-input mt-1 block w-full text-right" onchange="updateApp()">
+                        <input type="number" id="bondReturn" value="4.5" class="modern-input mt-1 block w-full text-right" onchange="updateApp()">
                         <p class="info-note note-invest">
                             <span class="chip">Quick Insight</span><br>
                             Ini ngaruh langsung ke <span class="hl">growth tabungan</span> kamu tiap tahun. Patokan santai: rata-rata obligasi Indonesia setelah dipotong pajak biasanya di kisaran <span class="hl">4.5%</span>.
@@ -971,7 +971,7 @@
             const saved = localStorage.getItem('financialPlannerData');
             if (saved) {
                 const data = JSON.parse(saved);
-                document.getElementById('bondReturn').value = data.bondReturn || 5.5;
+                document.getElementById('bondReturn').value = data.bondReturn || 4.5;
                 setMoneyInputValue('initialSavings', data.initialSavings || 0);
                 document.getElementById('startYear').value = data.startYear || new Date().getFullYear();
                 document.getElementById('retireYear').value = data.retireYear || 2053;
