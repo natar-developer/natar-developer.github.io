@@ -1,0 +1,1891 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Goals Tracker</title>
+    <link rel="icon" type="image/png" href="natar-dev.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-top: #f2f7fb;
+            --bg-bottom: #e6eef7;
+            --ink: #11243d;
+            --muted: #5a708f;
+            --card: rgba(255, 255, 255, 0.78);
+            --card-border: rgba(25, 61, 112, 0.14);
+            --accent: #0d5bd7;
+            --accent-2: #00a5a9;
+            --accent-3: #ff8a4c;
+            --success: #057a55;
+        }
+
+        body {
+            position: relative;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 8% 12%, rgba(59, 130, 246, 0.12), transparent 34%),
+                radial-gradient(circle at 92% 18%, rgba(6, 182, 212, 0.14), transparent 35%),
+                radial-gradient(circle at 68% 84%, rgba(249, 115, 22, 0.08), transparent 32%),
+                linear-gradient(160deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+            background-attachment: fixed;
+        }
+
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            pointer-events: none;
+            z-index: -1;
+            filter: blur(14px);
+            opacity: 0.38;
+        }
+
+        body::before {
+            width: 46vw;
+            height: 46vw;
+            max-width: 460px;
+            max-height: 460px;
+            top: -12vh;
+            left: -10vw;
+            border-radius: 39% 61% 54% 46% / 40% 41% 59% 60%;
+            background: linear-gradient(120deg, rgba(13, 91, 215, 0.3), rgba(0, 165, 169, 0.16));
+            animation: driftOne 20s ease-in-out infinite alternate;
+        }
+
+        body::after {
+            width: 42vw;
+            height: 42vw;
+            max-width: 430px;
+            max-height: 430px;
+            right: -8vw;
+            bottom: -14vh;
+            border-radius: 63% 37% 46% 54% / 57% 48% 52% 43%;
+            background: linear-gradient(150deg, rgba(255, 138, 76, 0.26), rgba(13, 91, 215, 0.18));
+            animation: driftTwo 24s ease-in-out infinite alternate;
+        }
+
+        @keyframes driftOne {
+            0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
+            50% { transform: translate3d(2vw, 3vh, 0) rotate(6deg) scale(1.04); }
+            100% { transform: translate3d(4vw, -2vh, 0) rotate(11deg) scale(0.96); }
+        }
+
+        @keyframes driftTwo {
+            0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
+            50% { transform: translate3d(-1.6vw, -3vh, 0) rotate(-7deg) scale(1.05); }
+            100% { transform: translate3d(-4vw, 2vh, 0) rotate(-12deg) scale(0.95); }
+        }
+
+        @keyframes cardIntro {
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(0.99);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        html,
+        body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        .frost-card {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(246, 250, 255, 0.86));
+            border: 1px solid var(--card-border);
+            box-shadow: 0 26px 46px -36px rgba(8, 39, 84, 0.55), 0 8px 18px -16px rgba(13, 91, 215, 0.35);
+            backdrop-filter: blur(11px);
+            animation: cardIntro 440ms cubic-bezier(.2,.65,.2,1) both;
+        }
+
+        .frost-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0));
+            pointer-events: none;
+        }
+
+        .section-title {
+            letter-spacing: -0.02em;
+            color: #102744;
+        }
+
+        p,
+        label,
+        th,
+        td,
+        li,
+        span {
+            color: #1a3350;
+        }
+
+        input,
+        select,
+        textarea {
+            color: #122944;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #5e7592;
+            opacity: 1;
+        }
+
+        .modern-input {
+            border: 1px solid #c9d8eb;
+            border-radius: 1rem;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+            transition: border-color 0.2s ease, box-shadow 0.25s ease, transform 0.2s ease;
+        }
+
+        .modern-input:focus {
+            outline: none;
+            border-color: #1f6fe0;
+            box-shadow: 0 0 0 5px rgba(31, 111, 224, 0.16);
+            transform: translateY(-1px);
+            background: #ffffff;
+        }
+
+        .gradient-btn {
+            position: relative;
+            isolation: isolate;
+            background-image: linear-gradient(120deg, var(--accent) 0%, var(--accent-2) 54%, var(--accent-3) 100%);
+            box-shadow: 0 16px 28px -16px rgba(13, 91, 215, 0.72);
+        }
+
+        .gradient-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            border-radius: inherit;
+            background: linear-gradient(120deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0));
+        }
+
+        .gradient-btn:hover {
+            filter: brightness(1.06) saturate(1.06);
+            transform: translateY(-2px);
+        }
+
+        .gradient-btn:active {
+            transform: translateY(0);
+        }
+
+        #targetSubmitBtn,
+        #targetCancelBtn {
+            border-radius: 0.95rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        }
+
+        #targetSubmitBtn {
+            background: linear-gradient(120deg, #0f172a, #1e293b 62%, #334155);
+            box-shadow: 0 12px 22px -16px rgba(15, 23, 42, 0.9);
+        }
+
+        #targetSubmitBtn:hover,
+        #targetCancelBtn:hover {
+            transform: translateY(-1px);
+        }
+
+        #targetCancelBtn {
+            border: 1px solid #d4dfed;
+            background: linear-gradient(180deg, #ffffff 0%, #f1f6fc 100%);
+            color: #26384f;
+        }
+
+        .soft-table thead th {
+            background: linear-gradient(180deg, #edf4ff 0%, #e7f0fd 100%);
+            color: #1a3555;
+        }
+
+        .soft-table tbody td {
+            color: #1a3555;
+        }
+
+        .info-note {
+            margin-top: 0.5rem;
+            padding: 0.72rem 0.82rem;
+            border-radius: 0.95rem;
+            border: 1px solid;
+            font-size: 0.76rem;
+            line-height: 1.45;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            color: #234160;
+        }
+
+        .info-note .chip {
+            display: inline-block;
+            font-weight: 700;
+            font-size: 0.68rem;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            padding: 0.15rem 0.45rem;
+            border-radius: 999px;
+            margin-bottom: 0.35rem;
+        }
+
+        .note-invest {
+            color: #123a63;
+            background: linear-gradient(135deg, rgba(234, 245, 255, 0.96), rgba(244, 252, 255, 0.94));
+            border-color: rgba(49, 108, 170, 0.42);
+            font-size: 0.83rem;
+            line-height: 1.6;
+        }
+
+        .note-invest .chip {
+            color: #0b4f9e;
+            background: rgba(15, 92, 192, 0.2);
+            font-size: 0.73rem;
+            padding: 0.2rem 0.52rem;
+        }
+
+        .note-target {
+            margin-bottom: 0.85rem;
+            color: #2f425f;
+            background: linear-gradient(135deg, rgba(240, 244, 255, 0.82), rgba(243, 252, 249, 0.82));
+            border-color: rgba(102, 129, 194, 0.32);
+        }
+
+        .note-target .chip {
+            color: #4d5fc7;
+            background: rgba(77, 95, 199, 0.14);
+        }
+
+        .note-pension {
+            margin-bottom: 0.9rem;
+            color: #184f42;
+            background: linear-gradient(135deg, rgba(228, 251, 242, 0.9), rgba(240, 255, 250, 0.86));
+            border-color: rgba(46, 160, 123, 0.36);
+        }
+
+        .note-pension .chip {
+            color: #0f8b66;
+            background: rgba(15, 139, 102, 0.16);
+        }
+
+        .hl {
+            font-weight: 700;
+            color: #183c72;
+        }
+
+        .hl-soft {
+            font-style: italic;
+            color: #106d7e;
+            font-weight: 600;
+        }
+
+        .compact-panel {
+            padding: 0.8rem;
+        }
+
+        @media (min-width: 768px) {
+            .compact-panel {
+                padding: 0.9rem;
+            }
+        }
+
+        .compact-grid .modern-input {
+            padding: 0.38rem 0.55rem;
+            min-height: 34px;
+            font-size: 0.82rem;
+            border-radius: 0.84rem;
+        }
+
+        .compact-grid label {
+            font-size: 0.75rem;
+            margin-bottom: 0.18rem;
+        }
+
+        .compact-grid .info-note {
+            font-size: 0.72rem;
+            padding: 0.52rem 0.62rem;
+        }
+
+        .compact-table thead th,
+        .compact-table tbody td {
+            padding: 0.42rem 0.5rem;
+            font-size: 0.78rem;
+            line-height: 1.2;
+        }
+
+        .compact-table thead th {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .chart-shell {
+            margin-top: 0.85rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(148, 172, 200, 0.45);
+            background: linear-gradient(180deg, rgba(252, 254, 255, 0.95), rgba(243, 249, 255, 0.95));
+            padding: 0.75rem;
+        }
+
+        .text-data-area {
+            min-height: 10.5rem;
+            resize: vertical;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            line-height: 1.4;
+        }
+
+        .status-note {
+            margin-top: 0.6rem;
+            font-size: 0.8rem;
+            border-radius: 0.7rem;
+            border: 1px solid transparent;
+            padding: 0.48rem 0.62rem;
+            display: none;
+        }
+
+        .status-note.is-success {
+            display: block;
+            background: rgba(220, 252, 231, 0.8);
+            border-color: rgba(22, 163, 74, 0.35);
+            color: #166534;
+        }
+
+        .status-note.is-error {
+            display: block;
+            background: rgba(254, 226, 226, 0.82);
+            border-color: rgba(220, 38, 38, 0.34);
+            color: #991b1b;
+        }
+
+        .is-collapsed {
+            display: none;
+        }
+
+        .chart-wrap {
+            position: relative;
+            height: 16rem;
+            width: 100%;
+        }
+
+        .chart-badges {
+            display: grid;
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+            gap: 0.45rem;
+            margin-bottom: 0.7rem;
+        }
+
+        .chart-badge {
+            border: 1px solid rgba(148, 172, 200, 0.44);
+            border-radius: 0.8rem;
+            background: rgba(255, 255, 255, 0.82);
+            padding: 0.42rem 0.56rem;
+        }
+
+        .chart-badge-label {
+            display: block;
+            font-size: 0.69rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #556d8b;
+            margin-bottom: 0.1rem;
+            font-weight: 700;
+        }
+
+        .chart-badge-value {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: #1a3352;
+        }
+
+        .chart-badge.is-danger {
+            border-color: rgba(220, 38, 38, 0.3);
+            background: rgba(254, 242, 242, 0.84);
+        }
+
+        .chart-badge.is-danger .chart-badge-value {
+            color: #b91c1c;
+        }
+
+        @media (min-width: 768px) {
+            .chart-badges {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (min-width: 768px) {
+            .chart-wrap {
+                height: 19rem;
+            }
+        }
+
+        .top-panels {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .top-panels {
+                grid-template-columns: minmax(0, 15fr) minmax(0, 70fr) minmax(0, 15fr) !important;
+            }
+        }
+
+        .top-panels > * {
+            min-width: 0;
+        }
+
+        header h1 {
+            color: #0d2242;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.26);
+        }
+
+        header > div {
+            border-radius: 1rem;
+            border-color: rgba(56, 133, 221, 0.26) !important;
+            background: linear-gradient(130deg, rgba(224, 240, 255, 0.9), rgba(231, 251, 247, 0.9));
+            color: #1f3a58;
+        }
+
+        #targetList tr,
+        #projectionTable tr {
+            transition: transform 0.16s ease, background-color 0.16s ease;
+        }
+
+        #targetList tr:hover,
+        #projectionTable tr:hover {
+            transform: translateY(-1px);
+            background-color: rgba(230, 241, 255, 0.75);
+        }
+
+        #targetList button,
+        #projectionTable button {
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        #targetList button:hover,
+        #projectionTable button:hover {
+            transform: translateY(-1px);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Hilangkan panah pada input number */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+    </style>
+</head>
+<body class="min-h-screen p-1.5 md:p-2">
+
+    <div class="w-full max-w-none mx-auto space-y-4">
+        <header class="mb-2 px-1 pt-1">
+            <h1 class="flex items-center justify-between gap-2 text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900">
+                <span>Financial Goals Tracker</span>
+                <img src="natar-dev.png" alt="Natar Developer" class="h-8 w-auto md:h-10 rounded-lg border border-slate-200/80 bg-white/70 p-1 shadow-sm">
+            </h1>
+            <p class="text-sm md:text-base text-slate-700">
+                Ini tempat buat <b>nge-track mimpi finansial masa depan</b> tanpa drama, biar dompet tetap waras dan goals tetap gas.
+            </p>
+            <div class="mt-2 rounded-xl border border-sky-200 bg-sky-50/80 px-3 py-2 text-xs md:text-sm leading-relaxed text-slate-700">
+                <span class="font-semibold text-sky-800">Heads up:</span>
+                Tool ini <b>cocok banget buat pegawai dengan income bulanan yang pasti</b>, jadi progress target bisa rapi dan kebaca.
+                <br>
+                Buat pengusaha juga tetap <b class="text-emerald-700">related banget</b>, tinggal pakai ini sebagai <i>guideline</i> nabung bulanan pas cashflow lagi cakep.
+                Intinya: <i class="text-violet-700">mimpi besar boleh, tapi planning-nya jangan ngambang</i>.
+            </div>
+            <div class="mt-2 flex flex-wrap gap-2">
+                <button id="toggleTextDataBtn" onclick="toggleTextDataPanel()" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-3 rounded-xl text-xs md:text-sm">
+                    Tampilkan Import/Export Data Teks
+                </button>
+                <button id="sampleDataBtn" onclick="promptUseSampleDataTemplate()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-2 px-3 rounded-xl text-xs md:text-sm">
+                    Gunakan Data Contoh
+                </button>
+            </div>
+        </header>
+
+        <div id="textDataPanel" class="frost-card compact-panel rounded-2xl is-collapsed">
+            <h2 class="section-title text-lg md:text-xl font-bold mb-4 border-b border-slate-200 pb-2">Export / Import Data Teks</h2>
+            <p class="text-xs md:text-sm text-slate-600 leading-relaxed mb-2">
+                Klik <b>Export ke Teks</b>, edit JSON di bawah sesuai kebutuhan, lalu klik <b>Import dari Teks</b> buat menerapkan perubahan.
+            </p>
+            <textarea id="dataTextArea" class="text-data-area modern-input w-full p-3 text-xs md:text-sm" spellcheck="false" placeholder="Data JSON akan muncul di sini..."></textarea>
+            <div class="mt-2 flex flex-wrap gap-2">
+                <button onclick="exportDataToText()" class="gradient-btn transition duration-200 text-white font-bold py-2 px-3 rounded-xl">Export ke Teks</button>
+                <button onclick="importDataFromText()" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-3 rounded-xl">Import dari Teks</button>
+            </div>
+            <div id="textDataStatus" class="status-note"></div>
+        </div>
+
+        <div class="top-panels">
+            <div class="frost-card compact-panel compact-grid rounded-2xl">
+                <h2 class="section-title text-lg md:text-xl font-bold mb-4 border-b border-slate-200 pb-2">1. Parameter Global</h2>
+                <div class="space-y-2.5">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700">Return Obligasi/Investasi (%)</label>
+                        <input type="number" id="bondReturn" value="5.5" class="modern-input mt-1 block w-full text-right" onchange="updateApp()">
+                        <p class="info-note note-invest">
+                            <span class="chip">Quick Insight</span><br>
+                            Ini ngaruh langsung ke <span class="hl">growth tabungan</span> kamu tiap tahun. Patokan santai: rata-rata obligasi Indonesia setelah dipotong pajak biasanya di kisaran <span class="hl">4.5%</span>.
+                            <br>
+                            Catatan penting: angka <span class="hl">4.5%</span> di sini konteksnya <span class="hl">return reksadana/obligasi</span> (nilai bisa naik-turun), <span class="hl">bukan</span> bunga tabungan bank.
+                        </p>
+                        <button onclick="showMutualFundPromoModal()" class="mt-2 w-full bg-sky-700 hover:bg-sky-800 text-white font-semibold py-2 px-3 rounded-xl text-xs md:text-sm">
+                            Nabung Reksadana
+                        </button>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700">Tabungan Awal (Rp)</label>
+                        <input type="text" id="initialSavings" value="Rp 0" class="money-mask modern-input mt-1 block w-full text-right" onchange="updateApp()">
+                        <p class="mt-1 text-xs text-slate-600 leading-relaxed">
+                            Pro tip dikit: masukin <b>80-90% aja</b> dari total tabungan kamu, biar sisanya keep dulu buat margin error, just in case ada hal random.
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700">Tahun Mulai</label>
+                            <input type="number" id="startYear" value="2026" class="modern-input mt-1 block w-full text-center" onchange="updateApp()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700">Tahun Pensiun</label>
+                            <input type="number" id="retireYear" value="2053" class="modern-input mt-1 block w-full text-center" onchange="updateApp()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="frost-card compact-panel compact-grid rounded-2xl">
+                <h2 class="section-title text-lg md:text-xl font-bold mb-4 border-b border-slate-200 pb-2">2.Target Finansial</h2>
+                <p class="info-note note-target">
+                    <span class="chip">Pro Tip</span><br>
+                    Inflasi otomatis ngikut kategori yang kamu pilih, tapi tetap bisa kamu adjust manual kalau kamu merasa harga bakal <span class="hl-soft">"lari" lebih kenceng</span>.
+                </p>
+                <div class="hidden md:grid md:grid-cols-7 gap-2 mb-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                    <div class="md:col-span-2">Nama Target</div>
+                    <div class="text-center">Tahun</div>
+                    <div>Kategori</div>
+                    <div class="text-right">Inflasi (%)</div>
+                    <div class="text-right">Harga Saat Ini</div>
+                    <div class="text-right">Harga Tahun Target</div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-7 gap-2 mb-3">
+                    <input type="text" id="tName" placeholder="Nama Target (Msl: Pendidikan Anak)" class="md:col-span-2 modern-input">
+                    <input type="number" id="tYear" placeholder="Tahun" class="modern-input text-center">
+                    <select id="tCategory" class="modern-input" onchange="applyDefaultTargetInflation()">
+                        <option value="pendidikan">Pendidikan</option>
+                        <option value="rumah">Rumah</option>
+                        <option value="umroh">Umroh</option>
+                        <option value="pensiun">Pensiun</option>
+                        <option value="lainnya">Lainnya</option>
+                    </select>
+                    <input type="number" id="tInflation" placeholder="Inflasi (%)" value="10" class="modern-input text-right">
+                    <input type="text" id="tPrice" placeholder="Harga Saat Ini (Rp)" class="money-mask modern-input text-right">
+                    <div>
+                        <input type="text" id="tFuturePrice" readonly value="Rp 0" class="modern-input text-right font-semibold text-sky-800 bg-slate-100/80">
+                        <p class="mt-1 text-[11px] text-slate-500 text-right">Harga tahun target berdasarkan inflasi <span id="tInflationLabel">0</span>%</p>
+                    </div>
+                    <div class="flex gap-2 md:col-span-7">
+                        <button id="targetSubmitBtn" onclick="saveTarget()" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-xl">Tambah</button>
+                        <button id="targetCancelBtn" onclick="cancelEditTarget()" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-800 px-4 py-2 rounded-xl">Batal Edit</button>
+                    </div>
+                </div>
+                <div id="pensionInsight" class="info-note note-pension hidden"></div>
+                <div class="overflow-x-auto rounded-xl border border-slate-200/80 bg-white/70">
+                    <table class="soft-table compact-table min-w-full divide-y divide-slate-200 text-sm">
+                        <thead>
+                            <tr>
+                                <th class="text-left font-semibold text-slate-600">Target</th>
+                                <th class="text-center font-semibold text-slate-600">Tahun</th>
+                                <th class="text-center font-semibold text-slate-600">Kategori</th>
+                                <th class="text-right font-semibold text-slate-600">Inflasi (%)</th>
+                                <th class="text-right font-semibold text-slate-600">Harga (Kini)</th>
+                                <th class="text-right font-semibold text-slate-600">Harga Tahun Target</th>
+                                <th class="text-center font-semibold text-slate-600">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="targetList" class="divide-y divide-slate-200 bg-white/80"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="frost-card compact-panel compact-grid rounded-2xl">
+                <h2 class="section-title text-lg md:text-xl font-bold mb-4 border-b border-slate-200 pb-2">3. Simulasi Tabungan</h2>
+                <div class="space-y-2.5">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700">Tabungan Rutin Bulanan (Rp)</label>
+                        <input type="text" id="monthlySavings" value="Rp 0" class="money-mask modern-input mt-1 block w-full text-right font-bold text-sky-800" onchange="updateApp()">
+                        <button onclick="simulateAndScrollToProjection()" class="mt-2 w-full bg-cyan-700 hover:bg-cyan-800 text-white font-semibold py-2 px-3 rounded-xl">
+                            Simulasikan
+                        </button>
+                        <p class="mt-1 text-xs text-slate-600 leading-relaxed">
+                            Isi nominal yang realistis buat kamu sisihin tiap bulan, biar goals kamu tetap jalan tanpa bikin cashflow megap-megap.
+                        </p>
+                    </div>
+                    <div class="h-px w-full bg-slate-300/80"></div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Tombol ini otomatis nyari nominal tabungan bulanan minimum yang kamu butuhin, biar semua target tetap kebayar dan saldo nggak jebol sampai tahun pensiun.
+                    </p>
+                    <button onclick="optimizeSavings()" class="gradient-btn transition duration-200 w-full text-white font-bold py-2.5 px-4 rounded-xl">
+                        Auto-Calculate (Optimize)
+                    </button>
+                    <p id="recommendationText" class="text-sm text-emerald-800 font-semibold hidden bg-emerald-50 p-3 rounded-xl border border-emerald-200"></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="projectionSection" class="frost-card compact-panel rounded-2xl">
+            <div class="mb-4 border-b border-slate-200 pb-2 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                <h2 class="section-title text-lg md:text-xl font-bold">Tabel Proyeksi</h2>
+                <button onclick="printProjectionPdf()" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-3 rounded-xl text-xs md:text-sm w-fit">
+                    Print PDF Proyeksi
+                </button>
+            </div>
+            <div class="overflow-x-auto h-[34rem] md:h-[40rem] border border-slate-200 rounded-xl bg-white/75">
+                <table class="soft-table compact-table min-w-full divide-y divide-slate-200 text-sm whitespace-nowrap">
+                    <thead class="sticky top-0 shadow-sm">
+                        <tr>
+                            <th class="text-center font-semibold text-slate-600">Tahun</th>
+                            <th class="text-left font-semibold text-slate-600">Target Tercapai</th>
+                            <th class="text-right font-semibold text-slate-600">Saldo Awal</th>
+                            <th class="text-right font-semibold text-slate-600">Inflow (Tahunan)</th>
+                            <th class="text-right font-semibold text-slate-600">Outflow (Kebutuhan)</th>
+                            <th class="text-right font-semibold text-slate-600">Saldo Akhir</th>
+                        </tr>
+                    </thead>
+                    <tbody id="projectionTable" class="divide-y divide-slate-200 bg-white/80"></tbody>
+                </table>
+            </div>
+            <div class="chart-shell">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
+                    <h3 class="text-sm md:text-base font-bold text-slate-800">Grafik Proyeksi Saldo</h3>
+                    <p id="chartInsight" class="text-xs md:text-sm text-slate-600">Belum ada data proyeksi.</p>
+                </div>
+                <div id="chartBadges" class="chart-badges"></div>
+                <div class="chart-wrap">
+                    <canvas id="projectionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sampleDataModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/55" onclick="hideSampleDataConfirmation()">
+        <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-2xl p-5" onclick="event.stopPropagation()">
+            <h3 class="text-lg font-bold text-slate-900">Konfirmasi Gunakan Data Contoh</h3>
+            <p class="mt-2 text-sm text-slate-700 leading-relaxed">
+                Aksi ini akan menghapus data yang sudah Anda isi, lalu menggantinya dengan data contoh secara otomatis.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2 justify-end">
+                <button onclick="hideSampleDataConfirmation()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2 px-3 rounded-xl text-sm">
+                    Batal
+                </button>
+                <button onclick="applySampleDataTemplateConfirmed()" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-3 rounded-xl text-sm">
+                    Ya, Hapus & Gunakan Contoh
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteTargetModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/55" onclick="cancelDeleteTarget()">
+        <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-2xl p-5" onclick="event.stopPropagation()">
+            <h3 class="text-lg font-bold text-slate-900">Konfirmasi Hapus Target</h3>
+            <p class="mt-2 text-sm text-slate-700 leading-relaxed">
+                Target finansial ini akan dihapus dari tabel dan perhitungan proyeksi. Lanjutkan?
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2 justify-end">
+                <button onclick="cancelDeleteTarget()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2 px-3 rounded-xl text-sm">
+                    Batal
+                </button>
+                <button onclick="confirmDeleteTarget()" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-3 rounded-xl text-sm">
+                    Ya, Hapus Target
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mutualFundPromoModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/55" onclick="hideMutualFundPromoModal()">
+        <div class="w-full max-w-lg rounded-2xl border border-slate-200 bg-white shadow-2xl p-5" onclick="event.stopPropagation()">
+            <h3 class="text-lg font-bold text-slate-900">Info Nabung Reksadana</h3>
+            <p class="mt-2 text-sm text-slate-700 leading-relaxed">
+                Kalau mau mulai simpan uang di reksadana, bisa pakai Bibit secara santai: Dapatkan cashback reksa dana senilai Rp 25.000 dengan kode referral
+                <span class="font-bold text-sky-700">satuuntuksemua</span> saat pendaftaran.
+            </p>
+            <p class="mt-2 text-sm text-slate-700 leading-relaxed">
+                Download sekarang:
+                <a href="https://linkto.bibit.id/SJpp/referralbibit" target="_blank" rel="noopener noreferrer" class="font-semibold text-sky-700 underline decoration-sky-600/70 underline-offset-2">https://linkto.bibit.id/SJpp/referralbibit</a>
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2 justify-end">
+                <button onclick="hideMutualFundPromoModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2 px-3 rounded-xl text-sm">
+                    Tutup
+                </button>
+                <a href="https://linkto.bibit.id/SJpp/referralbibit" target="_blank" rel="noopener noreferrer" class="bg-sky-700 hover:bg-sky-800 text-white font-semibold py-2 px-3 rounded-xl text-sm">
+                    Buka Link Bibit
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State Management
+        let targets = [];
+        let editingTargetId = null;
+        let pendingDeleteTargetId = null;
+        let projectionChart = null;
+        const CATEGORY_DEFAULT_INFLATION = {
+            pendidikan: 12, // Disesuaikan ke atas karena tren biaya kuliah
+            rumah: 7,       // Memperhitungkan kenaikan harga tanah
+            umroh: 8,       // Memperhitungkan risiko kurs
+            pensiun: 6,     // Gabungan biaya hidup dan kesehatan ringan
+            lainnya: 4
+        };
+
+        // Utility: Format Rupiah
+        const formatRp = (angka) => {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+        };
+
+        const formatRpDetailed = (angka) => {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(angka);
+        };
+
+        const formatRpInput = (angka) => {
+            return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(Math.max(0, Math.round(angka || 0)));
+        };
+
+        const parseCurrency = (value) => {
+            if (value === null || value === undefined) return 0;
+            const numeric = String(value).replace(/[^\d]/g, '');
+            return numeric ? Number(numeric) : 0;
+        };
+
+        const formatCompactCurrency = (value) => {
+            const abs = Math.abs(value);
+            if (abs >= 1_000_000_000_000) return `${(value / 1_000_000_000_000).toFixed(1)}T`;
+            if (abs >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(1)}M`;
+            if (abs >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}Jt`;
+            if (abs >= 1_000) return `${(value / 1_000).toFixed(1)}Rb`;
+            return value.toFixed(0);
+        };
+
+        // Utility: Future Value
+        const calculateFV = (pv, ratePercent, years) => {
+            return pv * Math.pow(1 + (ratePercent / 100), years);
+        };
+
+        const PENSION_DISCLAIMER_TEXT = 'Disclaimer: ini relevan kalau dana diparkir di instrumen yang relatif aman lawan inflasi kayak deposito / reksadana pasar uang. Return real life bisa naik-turun, jadi treat ini sebagai kompas, bukan kitab suci.';
+
+        const SAMPLE_DATA_TEMPLATE = {
+            bondReturn: 4.5,
+            initialSavings: 800000000,
+            startYear: 2026,
+            retireYear: 2053,
+            monthlySavings: 5370238,
+            targets: [
+                {
+                    id: 1775437190065,
+                    name: 'SD Anak',
+                    year: 2027,
+                    price: 15000000,
+                    category: 'pendidikan',
+                    inflation: 12
+                },
+                {
+                    id: 1775437217529,
+                    name: 'SMP Anak',
+                    year: 2033,
+                    price: 20000000,
+                    category: 'pendidikan',
+                    inflation: 12
+                },
+                {
+                    id: 1775437310721,
+                    name: 'Rumah',
+                    year: 2033,
+                    price: 500000000,
+                    category: 'rumah',
+                    inflation: 7
+                },
+                {
+                    id: 1775437914585,
+                    name: 'Mobil Baru',
+                    year: 2035,
+                    price: 200000000,
+                    category: 'lainnya',
+                    inflation: 4
+                },
+                {
+                    id: 1775437246729,
+                    name: 'SMA Anak',
+                    year: 2036,
+                    price: 25000000,
+                    category: 'pendidikan',
+                    inflation: 12
+                },
+                {
+                    id: 1775437374297,
+                    name: 'Umroh Keluarga',
+                    year: 2037,
+                    price: 90000000,
+                    category: 'umroh',
+                    inflation: 8
+                },
+                {
+                    id: 1775437267633,
+                    name: 'S1 Anak',
+                    year: 2039,
+                    price: 60000000,
+                    category: 'pendidikan',
+                    inflation: 12
+                },
+                {
+                    id: 1775437702905,
+                    name: 'Dana Pensiun',
+                    year: 2053,
+                    price: 300000000,
+                    category: 'pensiun',
+                    inflation: 6
+                }
+            ]
+        };
+
+        function buildPensionModeText(danaPensiun, passiveIncomeMonthly) {
+            return `Kalau target ini buat pensiun, estimasi dana di tahun target sekitar ${formatRpDetailed(danaPensiun)}. Dengan asumsi return tahunan 4%, potensi passive income kamu kurang lebih ${formatRpDetailed(passiveIncomeMonthly)}/bulan tanpa ngurangin pokok (teorinya ya bestie).`;
+        }
+
+        function setMoneyInputValue(id, value) {
+            const input = document.getElementById(id);
+            if (!input) return;
+            input.value = `Rp ${formatRpInput(value)}`;
+        }
+
+        function applyMoneyMask(inputEl) {
+            const amount = parseCurrency(inputEl.value);
+            inputEl.value = amount > 0 ? `Rp ${formatRpInput(amount)}` : 'Rp 0';
+        }
+
+        function attachMoneyMask(id) {
+            const inputEl = document.getElementById(id);
+            if (!inputEl) return;
+
+            inputEl.addEventListener('input', () => applyMoneyMask(inputEl));
+            inputEl.addEventListener('blur', () => applyMoneyMask(inputEl));
+            inputEl.addEventListener('focus', () => {
+                const amount = parseCurrency(inputEl.value);
+                inputEl.value = amount > 0 ? String(amount) : '';
+            });
+        }
+
+        function getTargetInflation(target, fallbackInflation = 3) {
+            if (typeof target.inflation === 'number' && !Number.isNaN(target.inflation)) {
+                return target.inflation;
+            }
+            return CATEGORY_DEFAULT_INFLATION[target.category] ?? fallbackInflation;
+        }
+
+        function calculateTargetFuturePrice(target, startYear, fallbackInflation) {
+            const diffYears = Math.max(0, target.year - startYear);
+            const inflationRate = getTargetInflation(target, fallbackInflation);
+            return calculateFV(target.price, inflationRate, diffYears);
+        }
+
+        function applyDefaultTargetInflation() {
+            const category = document.getElementById('tCategory').value;
+            const inflationInput = document.getElementById('tInflation');
+            inflationInput.value = CATEGORY_DEFAULT_INFLATION[category] ?? 3;
+            updateTargetFuturePricePreview();
+            updatePensionInsight();
+        }
+
+        function updateTargetFuturePricePreview() {
+            const tYear = parseInt(document.getElementById('tYear').value);
+            const tPrice = parseCurrency(document.getElementById('tPrice').value);
+            const inflation = parseFloat(document.getElementById('tInflation').value);
+            const startYear = parseInt(document.getElementById('startYear').value) || new Date().getFullYear();
+            const previewEl = document.getElementById('tFuturePrice');
+            const inflationLabelEl = document.getElementById('tInflationLabel');
+            if (!previewEl || !inflationLabelEl) return;
+
+            const safeInflation = Number.isNaN(inflation) ? 0 : inflation;
+            const years = Number.isNaN(tYear) ? 0 : Math.max(0, tYear - startYear);
+            const futurePrice = calculateFV(tPrice, safeInflation, years);
+
+            previewEl.value = `Rp ${formatRpInput(futurePrice)}`;
+            inflationLabelEl.textContent = String(safeInflation);
+        }
+
+        function updatePensionInsight() {
+            const insightEl = document.getElementById('pensionInsight');
+            if (!insightEl) return;
+
+            const category = document.getElementById('tCategory').value;
+            if (category !== 'pensiun') {
+                insightEl.classList.add('hidden');
+                insightEl.innerHTML = '';
+                return;
+            }
+
+            const startYear = parseInt(document.getElementById('startYear').value) || new Date().getFullYear();
+            const year = parseInt(document.getElementById('tYear').value) || startYear;
+            const price = parseCurrency(document.getElementById('tPrice').value);
+            const inflation = parseFloat(document.getElementById('tInflation').value);
+            const safeInflation = Number.isNaN(inflation) ? 5 : inflation;
+
+            const yearsToTarget = Math.max(0, year - startYear);
+            const danaPensiun = calculateFV(price, safeInflation, yearsToTarget);
+            const passiveIncomeMonthly = danaPensiun * 0.04 / 12;
+            const pensionMainText = buildPensionModeText(danaPensiun, passiveIncomeMonthly);
+
+            insightEl.innerHTML = `
+                <span class="chip">Pension Mode</span><br>
+                ${pensionMainText}
+                <br>
+                <span class="hl-soft">${PENSION_DISCLAIMER_TEXT}</span>
+            `;
+            insightEl.classList.remove('hidden');
+        }
+
+        // Load & Save LocalStorage
+        function loadData() {
+            const saved = localStorage.getItem('financialPlannerData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('bondReturn').value = data.bondReturn || 5.5;
+                setMoneyInputValue('initialSavings', data.initialSavings || 0);
+                document.getElementById('startYear').value = data.startYear || new Date().getFullYear();
+                document.getElementById('retireYear').value = data.retireYear || 2053;
+                setMoneyInputValue('monthlySavings', data.monthlySavings || 0);
+                targets = (data.targets || []).map(t => {
+                    const category = t.category || 'pendidikan';
+                    return {
+                        ...t,
+                        category,
+                        inflation: typeof t.inflation === 'number' && !Number.isNaN(t.inflation)
+                            ? t.inflation
+                            : (CATEGORY_DEFAULT_INFLATION[category] ?? 3)
+                    };
+                });
+            } else {
+                setMoneyInputValue('initialSavings', 0);
+                setMoneyInputValue('monthlySavings', 0);
+            }
+        }
+
+        function saveData() {
+            const data = {
+                bondReturn: parseFloat(document.getElementById('bondReturn').value) || 0,
+                initialSavings: parseCurrency(document.getElementById('initialSavings').value),
+                startYear: parseInt(document.getElementById('startYear').value) || new Date().getFullYear(),
+                retireYear: parseInt(document.getElementById('retireYear').value) || 2053,
+                monthlySavings: parseCurrency(document.getElementById('monthlySavings').value),
+                targets: targets
+            };
+            localStorage.setItem('financialPlannerData', JSON.stringify(data));
+            return data;
+        }
+
+        function sanitizeImportedData(raw) {
+            if (!raw || typeof raw !== 'object') {
+                throw new Error('Format data harus berupa objek JSON.');
+            }
+
+            const startYear = Number.parseInt(raw.startYear, 10);
+            const retireYear = Number.parseInt(raw.retireYear, 10);
+            if (Number.isNaN(startYear) || Number.isNaN(retireYear)) {
+                throw new Error('startYear dan retireYear wajib angka yang valid.');
+            }
+
+            const safeData = {
+                bondReturn: Number.parseFloat(raw.bondReturn) || 0,
+                initialSavings: Number(raw.initialSavings) || 0,
+                startYear,
+                retireYear,
+                monthlySavings: Number(raw.monthlySavings) || 0,
+                targets: []
+            };
+
+            const incomingTargets = Array.isArray(raw.targets) ? raw.targets : [];
+            safeData.targets = incomingTargets
+                .map((target, index) => {
+                    if (!target || typeof target !== 'object') return null;
+
+                    const name = String(target.name || '').trim();
+                    const year = Number.parseInt(target.year, 10);
+                    const price = Number(target.price);
+                    const category = String(target.category || 'pendidikan');
+                    const inflation = Number.parseFloat(target.inflation);
+
+                    if (!name || Number.isNaN(year) || Number.isNaN(price) || Number.isNaN(inflation)) {
+                        return null;
+                    }
+
+                    return {
+                        id: Number(target.id) || Date.now() + index,
+                        name,
+                        year,
+                        price: Math.max(0, price),
+                        category: CATEGORY_DEFAULT_INFLATION[category] !== undefined ? category : 'lainnya',
+                        inflation
+                    };
+                })
+                .filter(Boolean);
+
+            return safeData;
+        }
+
+        function setTextDataStatus(message, type) {
+            const statusEl = document.getElementById('textDataStatus');
+            if (!statusEl) return;
+
+            statusEl.textContent = message;
+            statusEl.classList.remove('is-success', 'is-error');
+            if (type === 'success') {
+                statusEl.classList.add('is-success');
+            } else if (type === 'error') {
+                statusEl.classList.add('is-error');
+            }
+        }
+
+        function toggleTextDataPanel() {
+            const panel = document.getElementById('textDataPanel');
+            const button = document.getElementById('toggleTextDataBtn');
+            if (!panel || !button) return;
+
+            const isCollapsed = panel.classList.toggle('is-collapsed');
+            button.textContent = isCollapsed
+                ? 'Tampilkan Import/Export Data Teks'
+                : 'Sembunyikan Import/Export Data Teks';
+
+            if (!isCollapsed) {
+                exportDataToText();
+            }
+        }
+
+        function exportDataToText() {
+            const data = saveData();
+            const textArea = document.getElementById('dataTextArea');
+            if (!textArea) return;
+
+            textArea.value = JSON.stringify(data, null, 2);
+            setTextDataStatus('Data berhasil diexport. Silakan edit teks JSON lalu import kembali.', 'success');
+        }
+
+        function importDataFromText() {
+            const textArea = document.getElementById('dataTextArea');
+            if (!textArea) return;
+
+            const rawText = textArea.value.trim();
+            if (!rawText) {
+                setTextDataStatus('Teks masih kosong. Klik Export dulu atau paste JSON data ke kotak teks.', 'error');
+                return;
+            }
+
+            try {
+                const parsed = JSON.parse(rawText);
+                const safeData = sanitizeImportedData(parsed);
+
+                targets = safeData.targets;
+                editingTargetId = null;
+                document.getElementById('bondReturn').value = safeData.bondReturn;
+                document.getElementById('startYear').value = safeData.startYear;
+                document.getElementById('retireYear').value = safeData.retireYear;
+                setMoneyInputValue('initialSavings', safeData.initialSavings);
+                setMoneyInputValue('monthlySavings', safeData.monthlySavings);
+                cancelEditTarget();
+
+                localStorage.setItem('financialPlannerData', JSON.stringify(safeData));
+                updateApp();
+                textArea.value = JSON.stringify(saveData(), null, 2);
+                setTextDataStatus('Data berhasil diimport dan diterapkan ke perhitungan.', 'success');
+            } catch (error) {
+                const message = error && error.message ? error.message : 'JSON tidak valid.';
+                setTextDataStatus(`Import gagal: ${message}`, 'error');
+            }
+        }
+
+        function hideSampleDataConfirmation() {
+            const modal = document.getElementById('sampleDataModal');
+            if (!modal) return;
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function showMutualFundPromoModal() {
+            const modal = document.getElementById('mutualFundPromoModal');
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function hideMutualFundPromoModal() {
+            const modal = document.getElementById('mutualFundPromoModal');
+            if (!modal) return;
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function promptUseSampleDataTemplate() {
+            const modal = document.getElementById('sampleDataModal');
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function applySampleDataTemplateConfirmed() {
+            const textArea = document.getElementById('dataTextArea');
+            if (!textArea) return;
+
+            // Data aktif akan diganti penuh dengan template contoh.
+            textArea.value = JSON.stringify(SAMPLE_DATA_TEMPLATE, null, 2);
+            importDataFromText();
+            hideSampleDataConfirmation();
+        }
+
+        function validateTargetYearRange(targetYear) {
+            const rawStartYear = parseInt(document.getElementById('startYear').value);
+            const rawRetireYear = parseInt(document.getElementById('retireYear').value);
+
+            if (Number.isNaN(rawStartYear) || Number.isNaN(rawRetireYear)) {
+                alert('Tahun mulai dan tahun pensiun harus valid dulu sebelum nambah target.');
+                return false;
+            }
+
+            const minYear = Math.min(rawStartYear, rawRetireYear);
+            const maxYear = Math.max(rawStartYear, rawRetireYear);
+
+            if (targetYear < minYear || targetYear > maxYear) {
+                alert(`Tahun target harus di antara ${minYear} sampai ${maxYear}.`);
+                return false;
+            }
+
+            return true;
+        }
+
+        // Target Management
+        function addTarget() {
+            const name = document.getElementById('tName').value.trim();
+            const year = parseInt(document.getElementById('tYear').value);
+            const price = parseCurrency(document.getElementById('tPrice').value);
+            const category = document.getElementById('tCategory').value;
+            const inflation = parseFloat(document.getElementById('tInflation').value);
+
+            if (name && year && price && !Number.isNaN(inflation)) {
+                if (!validateTargetYearRange(year)) return;
+                targets.push({ id: Date.now(), name, year, price, category, inflation });
+                document.getElementById('tName').value = '';
+                document.getElementById('tYear').value = '';
+                document.getElementById('tPrice').value = '';
+                applyDefaultTargetInflation();
+                updateApp();
+            } else {
+                alert("Yuk dilengkapi dulu bestie: Nama Target, Tahun, Kategori, Inflasi, dan Harga Saat Ini biar hitungannya nggak ngadi-ngadi.");
+            }
+        }
+
+        function saveTarget() {
+            if (editingTargetId) {
+                updateTarget(editingTargetId);
+                return;
+            }
+            addTarget();
+        }
+
+        function startEditTarget(id) {
+            const target = targets.find(t => t.id === id);
+            if (!target) return;
+
+            editingTargetId = id;
+            document.getElementById('tName').value = target.name;
+            document.getElementById('tYear').value = target.year;
+            document.getElementById('tCategory').value = target.category || 'pendidikan';
+            document.getElementById('tInflation').value = getTargetInflation(target, 3);
+            setMoneyInputValue('tPrice', target.price || 0);
+            updateTargetFuturePricePreview();
+
+            document.getElementById('targetSubmitBtn').textContent = 'Simpan Edit';
+            document.getElementById('targetCancelBtn').classList.remove('hidden');
+            updatePensionInsight();
+        }
+
+        function updateTarget(id) {
+            const name = document.getElementById('tName').value.trim();
+            const year = parseInt(document.getElementById('tYear').value);
+            const price = parseCurrency(document.getElementById('tPrice').value);
+            const category = document.getElementById('tCategory').value;
+            const inflation = parseFloat(document.getElementById('tInflation').value);
+
+            if (!(name && year && price && !Number.isNaN(inflation))) {
+                alert("Data editnya belum lengkap nih. Isi dulu Nama, Tahun, Kategori, Inflasi, dan Harga biar proyeksinya nggak halu.");
+                return;
+            }
+
+            if (!validateTargetYearRange(year)) return;
+
+            targets = targets.map(t => t.id === id ? { ...t, name, year, price, category, inflation } : t);
+            cancelEditTarget();
+            updateApp();
+        }
+
+        function cancelEditTarget() {
+            editingTargetId = null;
+            document.getElementById('tName').value = '';
+            document.getElementById('tYear').value = '';
+            document.getElementById('tPrice').value = '';
+            document.getElementById('tCategory').value = 'pendidikan';
+            applyDefaultTargetInflation();
+            updateTargetFuturePricePreview();
+
+            document.getElementById('targetSubmitBtn').textContent = 'Tambah';
+            document.getElementById('targetCancelBtn').classList.add('hidden');
+            updatePensionInsight();
+        }
+
+        function removeTarget(id) {
+            targets = targets.filter(t => t.id !== id);
+            if (editingTargetId === id) {
+                cancelEditTarget();
+            }
+            updateApp();
+        }
+
+        function requestRemoveTarget(id) {
+            pendingDeleteTargetId = id;
+            const modal = document.getElementById('deleteTargetModal');
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function cancelDeleteTarget() {
+            pendingDeleteTargetId = null;
+            const modal = document.getElementById('deleteTargetModal');
+            if (!modal) return;
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function confirmDeleteTarget() {
+            if (pendingDeleteTargetId === null) {
+                cancelDeleteTarget();
+                return;
+            }
+
+            const id = pendingDeleteTargetId;
+            pendingDeleteTargetId = null;
+            removeTarget(id);
+            cancelDeleteTarget();
+        }
+
+        function updateTargetInflation(id, value) {
+            const inflation = parseFloat(value);
+            if (Number.isNaN(inflation)) return;
+            targets = targets.map(t => t.id === id ? { ...t, inflation } : t);
+            updateApp();
+        }
+
+        function updateTargetCategory(id, category) {
+            targets = targets.map(t => {
+                if (t.id !== id) return t;
+                return {
+                    ...t,
+                    category,
+                    inflation: CATEGORY_DEFAULT_INFLATION[category] ?? t.inflation
+                };
+            });
+            updateApp();
+        }
+
+        function renderTargets(startYear, fallbackInflation) {
+            const tbody = document.getElementById('targetList');
+            tbody.innerHTML = '';
+            const lastTargetYear = targets.length ? Math.max(...targets.map(t => t.year)) : null;
+            targets.sort((a, b) => a.year - b.year).forEach(t => {
+                const futurePrice = calculateTargetFuturePrice(t, startYear, fallbackInflation);
+                const isFinalPensionTarget = t.category === 'pensiun' && lastTargetYear !== null && t.year === lastTargetYear;
+                const passiveIncomeMonthly = futurePrice * 0.04 / 12;
+                const pensionMainText = buildPensionModeText(futurePrice, passiveIncomeMonthly);
+                const pensionModeInfo = t.category === 'pensiun'
+                    ? `<div class="text-[11px] leading-relaxed ${isFinalPensionTarget ? 'text-emerald-700 font-semibold' : 'text-slate-600'}">Pension Mode: ${isFinalPensionTarget ? 'target saldo akhir (tidak jadi outflow)' : 'target dana pensiun di tahun ini'}.</div><div class="text-[11px] leading-relaxed text-slate-600">${pensionMainText}</div><div class="text-[11px] leading-relaxed text-slate-500">${PENSION_DISCLAIMER_TEXT}</div>`
+                    : '';
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="px-4 py-2">${t.name}${pensionModeInfo}</td>
+                        <td class="px-4 py-2 text-center">${t.year}</td>
+                        <td class="px-4 py-2 text-center">
+                            <select class="rounded-lg border border-slate-300 p-1 text-sm bg-white/90" onchange="updateTargetCategory(${t.id}, this.value)">
+                                <option value="pendidikan" ${t.category === 'pendidikan' ? 'selected' : ''}>Pendidikan</option>
+                                <option value="rumah" ${t.category === 'rumah' ? 'selected' : ''}>Rumah</option>
+                                <option value="umroh" ${t.category === 'umroh' ? 'selected' : ''}>Umroh</option>
+                                <option value="pensiun" ${t.category === 'pensiun' ? 'selected' : ''}>Pensiun</option>
+                                <option value="lainnya" ${t.category === 'lainnya' ? 'selected' : ''}>Lainnya</option>
+                            </select>
+                        </td>
+                        <td class="px-4 py-2 text-right">
+                            <input type="number" step="0.1" value="${getTargetInflation(t, fallbackInflation)}" class="w-20 rounded-lg border border-slate-300 p-1 text-right bg-white/90" onchange="updateTargetInflation(${t.id}, this.value)">
+                        </td>
+                        <td class="px-4 py-2 text-right">${formatRp(t.price)}</td>
+                        <td class="px-4 py-2 text-right font-semibold text-blue-700">${formatRp(futurePrice)}</td>
+                        <td class="px-4 py-2 text-center space-x-2">
+                            <button onclick="startEditTarget(${t.id})" class="text-blue-600 hover:text-blue-800 font-semibold">Edit</button>
+                            <button onclick="requestRemoveTarget(${t.id})" class="text-red-500 hover:text-red-700 font-bold text-xl align-middle">&times;</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Core Logic: Tabel Proyeksi
+        function generateProjection(data, testMonthly = null) {
+            let currentBalance = data.initialSavings;
+            const monthlyIn = testMonthly !== null ? testMonthly : data.monthlySavings;
+            const yearlyInflow = monthlyIn * 12;
+            const rows = [];
+            let isNegative = false;
+            const lastTargetYear = targets.length ? Math.max(...targets.map(t => t.year)) : null;
+
+            for (let yr = data.startYear; yr <= data.retireYear; yr++) {
+                // Cari target di tahun ini
+                const yearTargets = targets.filter(t => t.year === yr);
+                let targetNames = [];
+                let yearlyOutflow = 0;
+                let pensionTargetAtYear = 0;
+
+                yearTargets.forEach(t => {
+                    const isFinalPensionTarget =
+                        t.category === 'pensiun' &&
+                        lastTargetYear !== null &&
+                        t.year === lastTargetYear;
+
+                    targetNames.push(
+                        isFinalPensionTarget
+                            ? `${t.name} (${t.category || 'target'} - saldo akhir)`
+                            : `${t.name} (${t.category || 'target'})`
+                    );
+
+                    const futurePrice = calculateTargetFuturePrice(t, data.startYear, 3);
+                    // Target pensiun di target terakhir dianggap sebagai posisi saldo akhir, bukan outflow.
+                    if (!isFinalPensionTarget) {
+                        yearlyOutflow += futurePrice;
+                    } else {
+                        pensionTargetAtYear = Math.max(pensionTargetAtYear, futurePrice);
+                    }
+                });
+
+                const startBalance = currentBalance;
+                // Hitung Saldo Akhir: (Awal + Masuk - Keluar) + Bunga
+                const baseBalance = startBalance + yearlyInflow - yearlyOutflow;
+                const endBalance = baseBalance * (1 + (data.bondReturn / 100));
+                
+                if (endBalance < 0) isNegative = true;
+                if (pensionTargetAtYear > 0 && endBalance < pensionTargetAtYear) isNegative = true;
+
+                rows.push({
+                    year: yr,
+                    names: targetNames.join(', ') || '-',
+                    startBal: startBalance,
+                    inflow: yearlyInflow,
+                    outflow: yearlyOutflow,
+                    endBal: endBalance,
+                    pensionTarget: pensionTargetAtYear
+                });
+
+                currentBalance = endBalance;
+            }
+            return { rows, isNegative };
+        }
+
+        function renderTable(data, rows) {
+            const tbody = document.getElementById('projectionTable');
+            tbody.innerHTML = '';
+            
+            rows.forEach(r => {
+                const pensionNotMet = r.pensionTarget > 0 && r.endBal < r.pensionTarget;
+                const isWarning = r.endBal < 0 || pensionNotMet;
+                const rowClass = isWarning ? 'bg-red-50/90' : '';
+                const textClass = isWarning ? 'text-red-600 font-bold' : 'text-slate-900';
+                const pensionNote = r.pensionTarget > 0
+                    ? `<div class="text-[11px] ${pensionNotMet ? 'text-red-700 font-semibold' : 'text-slate-500'}">Target saldo pensiun: ${formatRp(r.pensionTarget)}</div>`
+                    : '';
+
+                tbody.innerHTML += `
+                    <tr class="${rowClass}">
+                        <td class="px-4 py-2 text-center">${r.year}</td>
+                        <td class="px-4 py-2 text-left truncate max-w-xs">${r.names}</td>
+                        <td class="px-4 py-2 text-right">${formatRp(r.startBal)}</td>
+                        <td class="px-4 py-2 text-right text-green-600">+${formatRp(r.inflow)}</td>
+                        <td class="px-4 py-2 text-right text-orange-600">-${formatRp(r.outflow)}${pensionNote}</td>
+                        <td class="px-4 py-2 text-right ${textClass}">${formatRp(r.endBal)}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderProjectionChart(rows) {
+            const canvas = document.getElementById('projectionChart');
+            const insightEl = document.getElementById('chartInsight');
+            const badgesEl = document.getElementById('chartBadges');
+            if (!canvas || !insightEl || !badgesEl) return;
+
+            if (!rows.length) {
+                if (projectionChart) {
+                    projectionChart.destroy();
+                    projectionChart = null;
+                }
+                insightEl.textContent = 'Belum ada data proyeksi.';
+                badgesEl.innerHTML = '';
+                return;
+            }
+
+            const firstNegativeRow = rows.find(r => r.endBal < 0);
+            const biggestOutflowRow = rows.reduce((max, row) => row.outflow > max.outflow ? row : max, rows[0]);
+            const labels = rows.map(r => String(r.year));
+            const endBalances = rows.map(r => r.endBal);
+            const inflows = rows.map(r => r.inflow);
+            const outflows = rows.map(r => r.outflow);
+            const minBalance = Math.min(...endBalances);
+            const maxBalance = Math.max(...endBalances);
+            const finalBalance = endBalances[endBalances.length - 1];
+
+            if (firstNegativeRow) {
+                insightEl.textContent = `Perhatian: saldo pertama kali minus di tahun ${firstNegativeRow.year}. Titik merah menandakan saldo negatif.`;
+            } else {
+                insightEl.textContent = `Saldo tetap positif sampai akhir periode. Pengeluaran target terbesar ada di ${biggestOutflowRow.year}.`;
+            }
+
+            badgesEl.innerHTML = `
+                <div class="chart-badge ${finalBalance < 0 ? 'is-danger' : ''}">
+                    <span class="chart-badge-label">Saldo Akhir Periode</span>
+                    <span class="chart-badge-value">${formatRp(finalBalance)}</span>
+                </div>
+                <div class="chart-badge ${minBalance < 0 ? 'is-danger' : ''}">
+                    <span class="chart-badge-label">Saldo Terendah</span>
+                    <span class="chart-badge-value">${formatRp(minBalance)}</span>
+                </div>
+                <div class="chart-badge">
+                    <span class="chart-badge-label">Saldo Tertinggi</span>
+                    <span class="chart-badge-value">${formatRp(maxBalance)}</span>
+                </div>
+            `;
+
+            if (projectionChart) {
+                projectionChart.destroy();
+            }
+
+            const negativeZonePlugin = {
+                id: 'negativeZone',
+                beforeDraw(chart) {
+                    const { ctx, chartArea, scales } = chart;
+                    if (!chartArea || !scales?.y) return;
+
+                    const zeroY = scales.y.getPixelForValue(0);
+                    const drawStartY = Math.max(zeroY, chartArea.top);
+
+                    if (drawStartY < chartArea.bottom) {
+                        ctx.save();
+                        ctx.fillStyle = 'rgba(220, 38, 38, 0.08)';
+                        ctx.fillRect(chartArea.left, drawStartY, chartArea.right - chartArea.left, chartArea.bottom - drawStartY);
+                        ctx.restore();
+                    }
+
+                    if (zeroY >= chartArea.top && zeroY <= chartArea.bottom) {
+                        ctx.save();
+                        ctx.strokeStyle = 'rgba(220, 38, 38, 0.58)';
+                        ctx.lineWidth = 1.2;
+                        ctx.setLineDash([5, 4]);
+                        ctx.beginPath();
+                        ctx.moveTo(chartArea.left, zeroY);
+                        ctx.lineTo(chartArea.right, zeroY);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                }
+            };
+
+            projectionChart = new Chart(canvas, {
+                plugins: [negativeZonePlugin],
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: 'Inflow Tahunan',
+                            data: inflows,
+                            backgroundColor: 'rgba(6, 182, 212, 0.3)',
+                            borderColor: 'rgba(8, 145, 178, 0.75)',
+                            borderWidth: 1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            type: 'bar',
+                            label: 'Outflow Target',
+                            data: outflows,
+                            backgroundColor: 'rgba(249, 115, 22, 0.3)',
+                            borderColor: 'rgba(234, 88, 12, 0.75)',
+                            borderWidth: 1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            type: 'line',
+                            label: 'Saldo Akhir',
+                            data: endBalances,
+                            tension: 0.32,
+                            fill: false,
+                            borderColor: '#0d5bd7',
+                            backgroundColor: '#0d5bd7',
+                            pointBackgroundColor: (ctx) => (ctx.raw < 0 ? '#dc2626' : '#0d5bd7'),
+                            pointBorderColor: (ctx) => (ctx.raw < 0 ? '#991b1b' : '#1e3a8a'),
+                            pointRadius: (ctx) => (ctx.raw < 0 ? 4 : 2.4),
+                            pointHoverRadius: (ctx) => (ctx.raw < 0 ? 6 : 4),
+                            segment: {
+                                borderColor: (ctx) => (ctx.p0.parsed.y < 0 || ctx.p1.parsed.y < 0 ? '#dc2626' : '#0d5bd7')
+                            },
+                            borderWidth: 2.4,
+                            yAxisID: 'y'
+                        }
+                    ]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#1f3552',
+                                boxWidth: 14,
+                                boxHeight: 8,
+                                usePointStyle: true,
+                                pointStyle: 'rectRounded'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.92)',
+                            titleColor: '#f8fafc',
+                            bodyColor: '#e2e8f0',
+                            padding: 10,
+                            callbacks: {
+                                label: (context) => `${context.dataset.label}: ${formatRp(context.raw || 0)}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(148, 163, 184, 0.16)' },
+                            ticks: { color: '#38506f' },
+                            title: {
+                                display: true,
+                                text: 'Tahun',
+                                color: '#3a5578',
+                                font: { weight: '600' }
+                            }
+                        },
+                        y: {
+                            grid: { color: 'rgba(148, 163, 184, 0.22)' },
+                            ticks: {
+                                color: '#38506f',
+                                callback: (value) => `Rp ${formatCompactCurrency(Number(value))}`
+                            },
+                            title: {
+                                display: true,
+                                text: 'Nominal',
+                                color: '#3a5578',
+                                font: { weight: '600' }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Auto-Calculate (Binary Search minimum savings)
+        function optimizeSavings() {
+            const data = saveData();
+            let low = 0;
+            let high = 1000000000; // Cek hingga 1 Milyar per bulan
+            let bestMatch = high;
+            let iterations = 0;
+
+            // Algoritma Binary Search untuk mencari titik nol
+            while (low <= high && iterations < 100) {
+                let mid = Math.floor((low + high) / 2);
+                let result = generateProjection(data, mid);
+                
+                if (!result.isNegative) {
+                    bestMatch = mid;
+                    high = mid - 1; // Coba cari nominal yang lebih kecil lagi
+                } else {
+                    low = mid + 1; // Uang kurang, naikkan tebakan
+                }
+                iterations++;
+            }
+
+            // Update UI
+            setMoneyInputValue('monthlySavings', bestMatch);
+            const recEl = document.getElementById('recommendationText');
+            recEl.innerHTML = `💡 <b>Rekomendasi santai:</b> Nabung minimal <b>${formatRp(bestMatch)}</b> per bulan ya, biar saldo kamu aman sampai pensiun dan nggak mode "akhir bulan makan mie terus".`;
+            recEl.classList.remove('hidden');
+            
+            updateApp();
+        }
+
+        function simulateAndScrollToProjection() {
+            updateApp();
+            const projectionSection = document.getElementById('projectionSection');
+            if (!projectionSection) return;
+            projectionSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function buildProjectionPrintRowsHtml(rows) {
+            return rows.map((r, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${r.year}</td>
+                    <td>${r.names}</td>
+                    <td>${formatRp(r.startBal)}</td>
+                    <td>${formatRp(r.inflow)}</td>
+                    <td>${formatRp(r.outflow)}</td>
+                    <td>${formatRp(r.endBal)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function buildProjectionPrintDocument(data, rows, chartImage) {
+            const createdAt = new Date().toLocaleString('id-ID');
+            const monthlySavings = parseCurrency(document.getElementById('monthlySavings').value);
+            const yearlySavings = monthlySavings * 12;
+            const chartSection = chartImage
+                ? `<img src="${chartImage}" alt="Grafik Proyeksi Saldo" class="chart-img">`
+                : '<p class="muted">Grafik belum tersedia. Jalankan simulasi terlebih dahulu.</p>';
+
+            return `
+                <!DOCTYPE html>
+                <html lang="id">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Laporan Proyeksi Finansial</title>
+                    <style>
+                        body {
+                            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+                            color: #0f172a;
+                            margin: 24px;
+                            line-height: 1.45;
+                        }
+
+                        h1 {
+                            margin: 0 0 4px;
+                            font-size: 24px;
+                        }
+
+                        h2 {
+                            margin: 22px 0 10px;
+                            font-size: 17px;
+                        }
+
+                        .meta {
+                            margin-bottom: 16px;
+                            color: #334155;
+                            font-size: 12px;
+                        }
+
+                        .summary {
+                            border: 1px solid #cbd5e1;
+                            border-radius: 12px;
+                            padding: 12px;
+                            margin-bottom: 14px;
+                            background: #f8fafc;
+                        }
+
+                        .summary-row {
+                            display: flex;
+                            justify-content: space-between;
+                            gap: 12px;
+                            padding: 4px 0;
+                            border-bottom: 1px dashed #cbd5e1;
+                        }
+
+                        .summary-row:last-child {
+                            border-bottom: none;
+                        }
+
+                        .summary-label {
+                            font-weight: 600;
+                        }
+
+                        .chart-wrap {
+                            border: 1px solid #cbd5e1;
+                            border-radius: 12px;
+                            padding: 10px;
+                            background: #ffffff;
+                        }
+
+                        .chart-img {
+                            width: 100%;
+                            height: auto;
+                            display: block;
+                        }
+
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            font-size: 12px;
+                            margin-top: 10px;
+                        }
+
+                        th,
+                        td {
+                            border: 1px solid #cbd5e1;
+                            padding: 6px 7px;
+                            vertical-align: top;
+                        }
+
+                        th {
+                            background: #eff6ff;
+                            text-align: left;
+                        }
+
+                        .muted {
+                            color: #64748b;
+                            font-size: 12px;
+                        }
+
+                        .page-break {
+                            page-break-before: always;
+                        }
+
+                        @media print {
+                            body {
+                                margin: 12mm;
+                            }
+
+                            .page-break {
+                                page-break-before: always;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>Laporan Proyeksi Finansial</h1>
+                    <div class="meta">Dibuat: ${createdAt}</div>
+
+                    <h2>Target Nabung Bulanan</h2>
+                    <div class="summary">
+                        <div class="summary-row">
+                            <span class="summary-label">Tabungan Rutin Bulanan</span>
+                            <span>${formatRp(monthlySavings)}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Target Nabung Tahunan</span>
+                            <span>${formatRp(yearlySavings)}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Periode Proyeksi</span>
+                            <span>${data.startYear} - ${data.retireYear}</span>
+                        </div>
+                    </div>
+
+                    <h2>Grafik Proyeksi</h2>
+                    <div class="chart-wrap">
+                        ${chartSection}
+                    </div>
+
+                    <h2 class="page-break">Tabel Proyeksi</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Tahun</th>
+                                <th>Target Tercapai</th>
+                                <th>Saldo Awal</th>
+                                <th>Inflow Tahunan</th>
+                                <th>Outflow Kebutuhan</th>
+                                <th>Saldo Akhir</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${buildProjectionPrintRowsHtml(rows)}
+                        </tbody>
+                    </table>
+                </body>
+                </html>
+            `;
+        }
+
+        function printProjectionPdf() {
+            const data = saveData();
+            const projection = generateProjection(data);
+            const canvas = document.getElementById('projectionChart');
+            const chartImage = canvas ? canvas.toDataURL('image/png', 1) : null;
+            const reportHtml = buildProjectionPrintDocument(data, projection.rows, chartImage);
+
+            const printWindow = window.open('', '_blank', 'width=1200,height=900');
+            if (!printWindow) {
+                alert('Popup terblokir. Izinkan popup untuk mencetak PDF.');
+                return;
+            }
+
+            printWindow.document.open();
+            printWindow.document.write(reportHtml);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.onload = () => {
+                printWindow.print();
+            };
+        }
+
+        // Main Update Flow
+        function updateApp() {
+            const data = saveData();
+            renderTargets(data.startYear, 3);
+            const proj = generateProjection(data);
+            renderTable(data, proj.rows);
+            renderProjectionChart(proj.rows);
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            attachMoneyMask('initialSavings');
+            attachMoneyMask('monthlySavings');
+            attachMoneyMask('tPrice');
+
+            ['tCategory', 'tYear', 'tInflation', 'tPrice', 'startYear'].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.addEventListener('input', updateTargetFuturePricePreview);
+                el.addEventListener('change', updateTargetFuturePricePreview);
+                el.addEventListener('input', updatePensionInsight);
+                el.addEventListener('change', updatePensionInsight);
+            });
+
+            loadData();
+            applyDefaultTargetInflation();
+            updateTargetFuturePricePreview();
+            updatePensionInsight();
+            updateApp();
+        });
+    </script>
+</body>
+</html>
