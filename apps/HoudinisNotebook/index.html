@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Houdini's Notebook</title>
+	<link rel="icon" type="image/png" href="../../natar-dev.png" />
+	<link rel="apple-touch-icon" href="../../natar-dev.png" />
+	<style>
+		:root {
+			--bg-base: #f6f8ff;
+			--bg-grad-a: #d8ecff;
+			--bg-grad-b: #ffe8d6;
+			--bg-grad-c: #dff7ea;
+			--panel: rgba(255, 255, 255, 0.86);
+			--panel-strong: #ffffff;
+			--line: #d8deef;
+			--text: #1e293b;
+			--text-soft: #5b6b84;
+			--brand: #ff6b35;
+			--brand-2: #2081ff;
+			--accent: #20c27b;
+			--highlight: #ffe36b;
+			--success-bg: #e7f8ee;
+			--success-text: #166640;
+			--danger-bg: #fff3f3;
+			--danger-text: #bb2e3c;
+			--radius-lg: 20px;
+			--radius-md: 14px;
+			--shadow: 0 20px 50px rgba(30, 41, 59, 0.12);
+		}
+
+		* {
+			box-sizing: border-box;
+			-webkit-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+		}
+
+		input,
+		textarea {
+			-webkit-user-select: text;
+			-ms-user-select: text;
+			user-select: text;
+		}
+
+		body {
+			margin: 0;
+			font-family: "Plus Jakarta Sans", "Segoe UI", "Calibri", sans-serif;
+			color: var(--text);
+			background: linear-gradient(155deg, var(--bg-base) 0%, #fbfdff 45%, #f9fcff 100%);
+			min-height: 100vh;
+			overflow-x: hidden;
+		}
+
+		body.locked .wrap {
+			display: none;
+		}
+
+		body::before,
+		body::after {
+			content: "";
+			position: fixed;
+			z-index: -1;
+			border-radius: 999px;
+			filter: blur(8px);
+			opacity: 0.9;
+		}
+
+		body::before {
+			width: 420px;
+			height: 420px;
+			top: -140px;
+			left: -120px;
+			background: radial-gradient(circle at center, var(--bg-grad-a), transparent 70%);
+			animation: floatA 8s ease-in-out infinite;
+		}
+
+		body::after {
+			width: 520px;
+			height: 520px;
+			bottom: -220px;
+			right: -180px;
+			background: radial-gradient(circle at center, var(--bg-grad-b), transparent 72%);
+			animation: floatB 10s ease-in-out infinite;
+		}
+
+		@keyframes floatA {
+			0%,
+			100% {
+				transform: translate3d(0, 0, 0);
+			}
+			50% {
+				transform: translate3d(24px, 20px, 0);
+			}
+		}
+
+		@keyframes floatB {
+			0%,
+			100% {
+				transform: translate3d(0, 0, 0);
+			}
+			50% {
+				transform: translate3d(-18px, -22px, 0);
+			}
+		}
+
+		.wrap {
+			width: min(1120px, 94vw);
+			margin: 12px auto 22px;
+		}
+
+		.topbar {
+			background: var(--panel);
+			border: 1px solid var(--line);
+			backdrop-filter: blur(10px);
+			border-radius: var(--radius-lg);
+			box-shadow: var(--shadow);
+			padding: 12px;
+			display: grid;
+			gap: 9px;
+			margin-bottom: 8px;
+			position: sticky;
+			top: 8px;
+			z-index: 10;
+			animation: appearUp 0.5s ease;
+		}
+
+		@keyframes appearUp {
+			from {
+				opacity: 0;
+				transform: translateY(14px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.headline {
+			display: grid;
+			gap: 4px;
+		}
+
+		.brand-row {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+
+		.brand-logo {
+			width: 40px;
+			height: 40px;
+			border-radius: 10px;
+			object-fit: cover;
+			border: 2px solid #e5eeff;
+			box-shadow: 0 10px 24px rgba(36, 84, 160, 0.22);
+			background: #fff;
+		}
+
+		.headline h1 {
+			margin: 0;
+			font-size: clamp(1.06rem, 2vw, 1.45rem);
+			line-height: 1.2;
+			letter-spacing: -0.02em;
+		}
+
+		.brand-caption {
+			font-size: 0.66rem;
+			font-weight: 700;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			color: #4c6b99;
+		}
+
+		.headline p {
+			margin: 0;
+			color: var(--text-soft);
+			line-height: 1.35;
+			font-size: 0.85rem;
+		}
+
+		.search-box {
+			position: relative;
+			display: grid;
+			grid-template-columns: 32px 1fr auto;
+			align-items: center;
+			gap: 10px;
+			padding: 8px 10px;
+			background: linear-gradient(120deg, #ffffff, #f9fbff);
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			transition: border-color 0.2s ease, box-shadow 0.2s ease;
+		}
+
+		.search-box:focus-within {
+			border-color: #8ab7ff;
+			box-shadow: 0 0 0 4px rgba(32, 129, 255, 0.13);
+		}
+
+		.search-icon {
+			width: 26px;
+			height: 26px;
+			display: grid;
+			place-items: center;
+			border-radius: 8px;
+			background: linear-gradient(135deg, #eef4ff, #f7faff);
+			color: #3878db;
+			font-size: 13px;
+		}
+
+		.search-box input {
+			width: 100%;
+			border: 0;
+			padding: 0;
+			font-size: 0.92rem;
+			font-weight: 500;
+			background: transparent;
+			color: var(--text);
+			outline: none;
+		}
+
+		.search-box input::placeholder {
+			color: #90a0b8;
+		}
+
+		.clear-btn {
+			appearance: none;
+			border: 1px solid #dce5f4;
+			background: #ffffff;
+			color: #425166;
+			padding: 6px 10px;
+			border-radius: 8px;
+			font-size: 0.8rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.2s ease;
+		}
+
+		.clear-btn:hover {
+			background: #f4f8ff;
+			border-color: #bdd4ff;
+		}
+
+		.quick-keywords {
+			display: flex;
+			flex-wrap: nowrap;
+			overflow-x: auto;
+			gap: 6px;
+			padding-bottom: 2px;
+		}
+
+		.warning-note {
+			border: 2px solid #ffc647;
+			background: linear-gradient(120deg, #fff8dd, #fff2c4);
+			color: #6e4b00;
+			padding: 8px 10px;
+			border-radius: 10px;
+			font-weight: 700;
+			font-size: 0.82rem;
+			line-height: 1.35;
+			box-shadow: 0 10px 18px rgba(255, 186, 44, 0.26);
+		}
+
+		.quick-key {
+			border: 1px solid #d8e4f9;
+			background: linear-gradient(135deg, #ffffff, #f7faff);
+			color: #34507a;
+			padding: 5px 9px;
+			border-radius: 999px;
+			cursor: pointer;
+			font-size: 0.78rem;
+			font-weight: 600;
+			transition: transform 0.15s ease, border-color 0.2s ease;
+			white-space: nowrap;
+		}
+
+		.quick-key:hover {
+			border-color: #9ec3ff;
+			transform: translateY(-1px);
+		}
+
+		.meta {
+			font-size: 0.78rem;
+			color: var(--text-soft);
+		}
+
+		.results {
+			display: grid;
+			gap: 9px;
+		}
+
+		.card {
+			background: var(--panel-strong);
+			border: 1px solid #d2d9ea;
+			border-radius: 14px;
+			box-shadow: var(--shadow);
+			overflow: hidden;
+			opacity: 0;
+			transform: translateY(12px) scale(0.99);
+			animation: cardIn 0.45s ease forwards;
+			animation-delay: calc(var(--delay, 0) * 80ms);
+		}
+
+		@keyframes cardIn {
+			to {
+				opacity: 1;
+				transform: translateY(0) scale(1);
+			}
+		}
+
+		.card-head {
+			padding: 10px;
+			background: linear-gradient(115deg, #f7faff, #ffffff);
+			border-bottom: 1px solid var(--line);
+			font-size: 0.78rem;
+			color: var(--text-soft);
+			display: flex;
+			gap: 6px;
+			flex-wrap: wrap;
+			align-items: center;
+		}
+
+		.paper-tag {
+			background: linear-gradient(135deg, #eff4ff, #f7fbff);
+			border: 1px solid #cedfff;
+			color: #2f4f88;
+			padding: 4px 8px;
+			border-radius: 8px;
+			font-size: 0.67rem;
+			font-weight: 800;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+		}
+
+		.chip {
+			background: #eef4ff;
+			color: #294b83;
+			border-radius: 999px;
+			padding: 4px 8px;
+			font-weight: 600;
+			font-size: 0.68rem;
+			border: 1px solid #cadffc;
+		}
+
+		.card-body {
+			padding: 10px 10px 12px;
+			background:
+				repeating-linear-gradient(
+					180deg,
+					#ffffff,
+					#ffffff 30px,
+					#f9fbff 31px,
+					#f9fbff 32px
+				);
+		}
+
+		.question {
+			margin: 0 0 8px;
+			font-size: 0.95rem;
+			font-weight: 600;
+			line-height: 1.45;
+		}
+
+		.question-label {
+			display: inline-block;
+			margin-bottom: 6px;
+			padding: 4px 8px;
+			border-radius: 999px;
+			font-size: 0.65rem;
+			font-weight: 700;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			background: #e8f2ff;
+			color: #29538f;
+		}
+
+		.options {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			display: grid;
+			gap: 6px;
+		}
+
+		.option {
+			border: 1px solid #d8e1f1;
+			border-radius: 9px;
+			padding: 7px 8px;
+			line-height: 1.35;
+			font-size: 0.85rem;
+			background: linear-gradient(130deg, #fcfdff, #f8fbff);
+			display: grid;
+			grid-template-columns: 24px 1fr;
+			gap: 8px;
+			align-items: start;
+		}
+
+		.option-label {
+			display: grid;
+			place-items: center;
+			width: 22px;
+			height: 22px;
+			border-radius: 50%;
+			border: 1px solid #b7caea;
+			background: #f0f6ff;
+			color: #2f4d82;
+			font-weight: 800;
+			font-size: 0.72rem;
+		}
+
+		.option.correct {
+			border-color: #a8e3c4;
+			background: var(--success-bg);
+			color: #155f3d;
+			font-weight: 600;
+		}
+
+		.option.correct .option-label {
+			border-color: #7bcc9e;
+			background: #d7f2e4;
+			color: #175c3c;
+		}
+
+		.answer {
+			margin-top: 8px;
+			border: 1px solid #a8e3c4;
+			border-radius: 9px;
+			background: var(--success-bg);
+			color: var(--success-text);
+			padding: 7px 8px;
+			font-size: 0.83rem;
+			font-weight: 600;
+		}
+
+		mark {
+			background: var(--highlight);
+			color: inherit;
+			border-radius: 6px;
+			padding: 0 2px;
+		}
+
+		.notice {
+			border: 1px dashed #cad6eb;
+			border-radius: 12px;
+			background: linear-gradient(120deg, #ffffff, #f8fbff);
+			padding: 12px;
+			font-size: 0.86rem;
+			color: var(--text-soft);
+			font-weight: 500;
+			box-shadow: var(--shadow);
+		}
+
+		.error {
+			border-color: #f8d1d4;
+			color: var(--danger-text);
+			background: var(--danger-bg);
+		}
+
+		.unlock-overlay {
+			position: fixed;
+			inset: 0;
+			background: radial-gradient(circle at 20% 20%, #121b2f, #05070f 68%);
+			display: grid;
+			place-items: center;
+			padding: 16px;
+			z-index: 40;
+			backdrop-filter: blur(4px);
+			overflow: hidden;
+		}
+
+		.unlock-overlay::before,
+		.unlock-overlay::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			width: 50.5%;
+			background: linear-gradient(180deg, #121826, #060913);
+			border-right: 1px solid #223154;
+			border-left: 1px solid #223154;
+			z-index: 1;
+			pointer-events: none;
+			opacity: 0;
+			transition: transform 0.72s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
+		}
+
+		.unlock-overlay::before {
+			left: 0;
+			transform: translateX(-100%);
+		}
+
+		.unlock-overlay::after {
+			right: 0;
+			transform: translateX(100%);
+		}
+
+		.unlock-overlay.opening::before,
+		.unlock-overlay.opening::after {
+			opacity: 1;
+			transform: translateX(0);
+		}
+
+		.unlock-overlay.opening.doors-open::before {
+			transform: translateX(-100%);
+		}
+
+		.unlock-overlay.opening.doors-open::after {
+			transform: translateX(100%);
+		}
+
+		.unlock-card {
+			width: min(460px, 94vw);
+			background: linear-gradient(160deg, #121a2b, #0a101e);
+			border: 1px solid #2b3d61;
+			border-radius: 16px;
+			box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+			padding: 16px;
+			display: grid;
+			gap: 10px;
+			position: relative;
+			z-index: 3;
+			transition: transform 0.24s ease, box-shadow 0.24s ease;
+		}
+
+		.unlock-card h2 {
+			margin: 0;
+			font-size: 1.05rem;
+			color: #eaf1ff;
+		}
+
+		.unlock-card p {
+			margin: 0;
+			font-size: 0.84rem;
+			line-height: 1.45;
+			color: #9fb0cd;
+		}
+
+		.unlock-form {
+			display: grid;
+			gap: 8px;
+		}
+
+		.unlock-form input {
+			width: 100%;
+			border: 1px solid #334b74;
+			border-radius: 10px;
+			padding: 9px 10px;
+			font-size: 0.9rem;
+			outline: none;
+			background: #0d1525;
+			color: #eef4ff;
+		}
+
+		.unlock-form input:focus {
+			border-color: #5d8fe3;
+			box-shadow: 0 0 0 3px rgba(66, 132, 238, 0.2);
+		}
+
+		.unlock-actions {
+			display: flex;
+			gap: 8px;
+			justify-content: flex-end;
+		}
+
+		.unlock-actions button {
+			border: 1px solid #375182;
+			background: #10192b;
+			color: #dce8ff;
+			padding: 7px 10px;
+			border-radius: 9px;
+			font-size: 0.82rem;
+			font-weight: 700;
+			cursor: pointer;
+		}
+
+		.unlock-actions button.primary {
+			background: #1f78ff;
+			border-color: #1f78ff;
+			color: #fff;
+		}
+
+		.unlock-status {
+			font-size: 0.8rem;
+			font-weight: 700;
+			color: #bcd6ff;
+			background: #132038;
+			border: 1px solid #355a96;
+			padding: 6px 8px;
+			border-radius: 8px;
+		}
+
+		.unlock-status.error {
+			color: #ffd5db;
+			background: #3a0d18;
+			border-color: #a43a4d;
+		}
+
+		.unlock-card.scary {
+			animation: scaryJolt 0.62s ease, scaryPulse 1s linear;
+		}
+
+		.unlock-card.scary h2,
+		.unlock-card.scary .unlock-status.error {
+			text-shadow: 0 0 10px rgba(255, 64, 91, 0.75);
+		}
+
+		.unlock-card.success {
+			animation: successLift 0.55s ease;
+		}
+
+		@keyframes scaryJolt {
+			0%,
+			100% { transform: translateX(0) skewX(0deg); }
+			18% { transform: translateX(-8px) skewX(-2deg); }
+			36% { transform: translateX(9px) skewX(2deg); }
+			54% { transform: translateX(-7px) skewX(-1.5deg); }
+			72% { transform: translateX(6px) skewX(1deg); }
+		}
+
+		@keyframes scaryPulse {
+			0%, 100% { filter: saturate(1); }
+			50% { filter: saturate(1.35) hue-rotate(-18deg); }
+		}
+
+		@keyframes successLift {
+			0% { transform: scale(1); }
+			40% { transform: scale(1.03); }
+			100% { transform: scale(0.98); }
+		}
+
+		.hidden {
+			display: none !important;
+		}
+
+		@media (max-width: 720px) {
+			.wrap {
+				width: 94vw;
+				margin-top: 8px;
+			}
+
+			.topbar {
+				padding: 10px;
+				position: static;
+			}
+
+			.search-box {
+				grid-template-columns: 24px 1fr;
+			}
+
+			.clear-btn {
+				grid-column: 1 / -1;
+				justify-self: end;
+			}
+
+			.warning-note {
+				font-size: 0.78rem;
+			}
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			* {
+				animation: none !important;
+				transition: none !important;
+			}
+		}
+
+		@media print {
+			body {
+				display: none !important;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div id="unlockOverlay" class="unlock-overlay">
+		<div class="unlock-card">
+			<h2>Akses Terkunci</h2>
+			<p>
+				Masukkan password untuk melanjutkan. Password tidak disimpan pada halaman.
+			</p>
+			<form id="unlockForm" class="unlock-form">
+				<input id="passwordInput" type="password" autocomplete="current-password" placeholder="Masukkan password" required />
+				<div class="unlock-actions">
+					<button type="button" id="unlockClearBtn">Bersihkan</button>
+					<button class="primary" type="submit">Buka</button>
+				</div>
+			</form>
+			<div id="unlockStatus" class="unlock-status">Konten terkunci. Masukkan password untuk lanjut.</div>
+		</div>
+	</div>
+
+	<main class="wrap">
+		<section class="topbar">
+			<div class="headline">
+				<div class="brand-row">
+					<img class="brand-logo" src="../../natar-dev.png" alt="Logo Natar Dev" />
+					<div>
+						<div class="brand-caption">Natar Developer</div>
+						<h1>Pencarian Soal Cerdas</h1>
+					</div>
+				</div>
+				<p>
+					Hasil diperbarui otomatis setiap kali kata kunci berubah. Menampilkan maksimal
+					5 soal teratas dengan tampilan seperti lembar soal ujian.
+				</p>
+			</div>
+
+			<div class="search-box">
+				<div class="search-icon" aria-hidden="true">&#128269;</div>
+				<input
+					id="keywordInput"
+					type="text"
+					placeholder="Ketik kata kunci... contoh: cuti, kompetensi, reformasi"
+					autocomplete="off"
+				/>
+				<button type="button" id="clearBtn" class="clear-btn">Reset</button>
+			</div>
+
+			<div class="quick-keywords" id="quickKeywords">
+				<button class="quick-key" type="button" data-key="kompetensi">kompetensi</button>
+				<button class="quick-key" type="button" data-key="cuti">cuti</button>
+				<button class="quick-key" type="button" data-key="kinerja">kinerja</button>
+				<button class="quick-key" type="button" data-key="jabatan">jabatan</button>
+				<button class="quick-key" type="button" data-key="talenta">talenta</button>
+			</div>
+
+			<div class="warning-note">
+				PERHATIAN: Urutan pilihan jawaban di halaman ini mungkin acak/random sehingga
+				bisa berbeda dari urutan pilihan pada aplikasi ujian sesungguhnya.
+			</div>
+
+			<div id="meta" class="meta">Memuat bank soal...</div>
+		</section>
+
+		<section id="results" class="results"></section>
+	</main>
+
+	<script>
+		const MAX_RESULTS = 5;
+		const SEARCH_DELAY = 180;
+		let questionBank = [];
+		let debounceTimer = null;
+		let isUnlocked = false;
+
+		const unlockOverlayEl = document.getElementById("unlockOverlay");
+		const unlockCardEl = unlockOverlayEl.querySelector(".unlock-card");
+		const unlockFormEl = document.getElementById("unlockForm");
+		const passwordInputEl = document.getElementById("passwordInput");
+		const unlockStatusEl = document.getElementById("unlockStatus");
+		const unlockClearBtnEl = document.getElementById("unlockClearBtn");
+		const keywordEl = document.getElementById("keywordInput");
+		const clearBtnEl = document.getElementById("clearBtn");
+		const quickKeywordsEl = document.getElementById("quickKeywords");
+		const resultsEl = document.getElementById("results");
+		const metaEl = document.getElementById("meta");
+
+		function escapeRegExp(text) {
+			return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+		}
+
+		function stripHtml(html) {
+			const temp = document.createElement("div");
+			temp.innerHTML = html || "";
+			return temp.textContent || temp.innerText || "";
+		}
+
+		function highlightInHtml(html, keyword) {
+			if (!keyword.trim()) {
+				return html || "";
+			}
+
+			const wrapper = document.createElement("div");
+			wrapper.innerHTML = html || "";
+
+			const escaped = escapeRegExp(keyword.trim());
+			const regex = new RegExp(`(${escaped})`, "gi");
+
+			function walk(node) {
+				if (node.nodeType === Node.TEXT_NODE) {
+					const text = node.nodeValue;
+					if (!text || !regex.test(text)) {
+						regex.lastIndex = 0;
+						return;
+					}
+					regex.lastIndex = 0;
+
+					const fragment = document.createDocumentFragment();
+					let last = 0;
+					text.replace(regex, (match, _group, offset) => {
+						if (offset > last) {
+							fragment.appendChild(document.createTextNode(text.slice(last, offset)));
+						}
+						const mark = document.createElement("mark");
+						mark.textContent = match;
+						fragment.appendChild(mark);
+						last = offset + match.length;
+						return match;
+					});
+
+					if (last < text.length) {
+						fragment.appendChild(document.createTextNode(text.slice(last)));
+					}
+
+					node.parentNode.replaceChild(fragment, node);
+					return;
+				}
+
+				const children = Array.from(node.childNodes);
+				children.forEach(walk);
+			}
+
+			walk(wrapper);
+			return wrapper.innerHTML;
+		}
+
+		function getOptions(item) {
+			return [item.option_1, item.option_2, item.option_3, item.option_4, item.option_5]
+				.map((opt) => opt || "")
+				.filter((opt) => opt.trim() !== "");
+		}
+
+		function getChoiceLabel(index) {
+			return String.fromCharCode(65 + index);
+		}
+
+		function sleep(ms) {
+			return new Promise((resolve) => {
+				setTimeout(resolve, ms);
+			});
+		}
+
+		function base64ToBytes(base64) {
+			const normalized = atob(base64);
+			const bytes = new Uint8Array(normalized.length);
+			for (let i = 0; i < normalized.length; i += 1) {
+				bytes[i] = normalized.charCodeAt(i);
+			}
+			return bytes;
+		}
+
+		async function deriveAesKey(password, saltBytes, iterations) {
+			const encoder = new TextEncoder();
+			const passwordKey = await crypto.subtle.importKey(
+				"raw",
+				encoder.encode(password),
+				"PBKDF2",
+				false,
+				["deriveKey"]
+			);
+
+			return crypto.subtle.deriveKey(
+				{
+					name: "PBKDF2",
+					salt: saltBytes,
+					iterations,
+					hash: "SHA-256"
+				},
+				passwordKey,
+				{ name: "AES-GCM", length: 256 },
+				false,
+				["decrypt"]
+			);
+		}
+
+		async function decryptPayload(payload, password) {
+			if (!payload || !payload.salt || !payload.iv || !payload.ct || !payload.iter) {
+				throw new Error("Format file enkripsi tidak valid.");
+			}
+
+			const saltBytes = base64ToBytes(payload.salt);
+			const ivBytes = base64ToBytes(payload.iv);
+			const cipherBytes = base64ToBytes(payload.ct);
+
+			const key = await deriveAesKey(password, saltBytes, Number(payload.iter));
+			const plainBuffer = await crypto.subtle.decrypt(
+				{ name: "AES-GCM", iv: ivBytes },
+				key,
+				cipherBytes
+			);
+
+			return new TextDecoder().decode(plainBuffer);
+		}
+
+		function scoreItem(item, keyword) {
+			const key = keyword.toLowerCase();
+			const fields = [item.question, item.option_1, item.option_2, item.option_3, item.option_4, item.option_5]
+				.map((part) => stripHtml(part || "").toLowerCase());
+
+			let score = 0;
+			fields.forEach((field, index) => {
+				if (!field.includes(key)) {
+					return;
+				}
+
+				const exactCount = field.split(key).length - 1;
+				score += exactCount * (index === 0 ? 3 : 1);
+			});
+			return score;
+		}
+
+		function renderMessage(message, isError = false) {
+			resultsEl.innerHTML = `<div class="notice ${isError ? "error" : ""}">${message}</div>`;
+		}
+
+		function renderCards(list, keyword) {
+			if (!list.length) {
+				renderMessage("Tidak ada soal yang cocok dengan kata kunci tersebut.");
+				return;
+			}
+
+			resultsEl.innerHTML = list
+				.map((item, index) => {
+					const options = getOptions(item);
+					const answerIndex = Number(item.answer) - 1;
+					const answerText = options[answerIndex] || "Jawaban tidak tersedia";
+					const answerLabel = answerIndex >= 0 ? getChoiceLabel(answerIndex) : "-";
+
+					const optionHtml = options
+						.map((option, idx) => {
+							const isCorrect = idx === answerIndex;
+							const optionLabel = getChoiceLabel(idx);
+							return `
+								<li class="option ${isCorrect ? "correct" : ""}">
+									<span class="option-label">${optionLabel}</span>
+									<span>${highlightInHtml(option, keyword)}</span>
+								</li>
+							`;
+						})
+						.join("");
+
+					return `
+						<article class="card" style="--delay:${index}">
+							<div class="card-head">
+								<span class="paper-tag">Soal #${index + 1}</span>
+								<span class="chip">ID Soal: ${item.question_id || "-"}</span>
+								<span class="chip">Level: ${item.level || "-"}</span>
+								<span class="chip">Kesulitan: ${item.difficulty || "-"}</span>
+							</div>
+							<div class="card-body">
+								<div class="question-label">Pertanyaan</div>
+								<p class="question">${highlightInHtml(item.question || "", keyword)}</p>
+								<ol class="options">${optionHtml}</ol>
+								<div class="answer">Jawaban Benar: ${answerLabel}. ${highlightInHtml(answerText, keyword)}</div>
+							</div>
+						</article>
+					`;
+				})
+				.join("");
+		}
+
+		function handleSearch() {
+			if (!isUnlocked) {
+				renderMessage("Masukkan password untuk membuka data soal.");
+				return;
+			}
+
+			const keyword = keywordEl.value.trim();
+
+			if (!keyword) {
+				renderMessage("Ketik kata kunci untuk mulai mencari soal.");
+				metaEl.textContent = `Menampilkan hasil secara otomatis. Total bank soal: ${questionBank.length}.`;
+				return;
+			}
+
+			const filtered = questionBank
+				.map((item) => ({ item, score: scoreItem(item, keyword) }))
+				.filter((entry) => entry.score > 0)
+				.sort((a, b) => b.score - a.score)
+				.slice(0, MAX_RESULTS)
+				.map((entry) => entry.item);
+
+			metaEl.textContent = `Kata kunci: "${keyword}". Ditemukan ${filtered.length} soal (maksimal ${MAX_RESULTS} ditampilkan).`;
+			renderCards(filtered, keyword);
+		}
+
+		function handleSearchDebounced() {
+			clearTimeout(debounceTimer);
+			debounceTimer = setTimeout(() => {
+				handleSearch();
+			}, SEARCH_DELAY);
+		}
+
+		async function loadQuestionsFromEncrypted(password) {
+			try {
+				const response = await fetch("./data.enc", { cache: "no-store" });
+				if (!response.ok) {
+					throw new Error(`Gagal membaca data.enc (${response.status})`);
+				}
+
+				const encryptedPayload = await response.json();
+				const plaintext = await decryptPayload(encryptedPayload, password);
+				const data = JSON.parse(plaintext);
+				if (!Array.isArray(data)) {
+					throw new Error("Data hasil dekripsi bukan array soal.");
+				}
+
+				questionBank = data;
+				isUnlocked = true;
+				unlockCardEl.classList.remove("scary");
+				unlockCardEl.classList.add("success");
+				unlockOverlayEl.classList.add("opening");
+				await sleep(120);
+				unlockOverlayEl.classList.add("doors-open");
+				await sleep(740);
+				unlockOverlayEl.classList.add("hidden");
+				passwordInputEl.value = "";
+				unlockStatusEl.classList.remove("error");
+				unlockStatusEl.textContent = "Akses berhasil.";
+				metaEl.textContent = `Data siap. Ketik kata kunci dan hasil akan muncul otomatis.`;
+				renderMessage("Data siap. Coba ketik kata seperti kompetensi, cuti, atau jabatan.");
+				keywordEl.focus();
+			} catch (error) {
+				isUnlocked = false;
+				unlockStatusEl.classList.add("error");
+				unlockCardEl.classList.remove("scary");
+				void unlockCardEl.offsetWidth;
+				unlockCardEl.classList.add("scary");
+				if (error && error.name === "OperationError") {
+					unlockStatusEl.textContent = "Password salah atau akses ditolak. Coba lagi.";
+					return;
+				}
+				unlockStatusEl.textContent = `Gagal memproses akses: ${error.message}`;
+			}
+		}
+
+		function setLockedUI() {
+			document.body.classList.add("locked");
+			keywordEl.disabled = true;
+			clearBtnEl.disabled = true;
+			quickKeywordsEl.querySelectorAll("button").forEach((btn) => {
+				btn.disabled = true;
+			});
+			metaEl.textContent = "Konten terkunci. Masukkan password untuk membuka akses.";
+			renderMessage("Konten terkunci. Masukkan password terlebih dahulu.");
+		}
+
+		function setUnlockedUI() {
+			document.body.classList.remove("locked");
+			keywordEl.disabled = false;
+			clearBtnEl.disabled = false;
+			quickKeywordsEl.querySelectorAll("button").forEach((btn) => {
+				btn.disabled = false;
+			});
+		}
+
+		keywordEl.addEventListener("input", () => {
+			handleSearchDebounced();
+		});
+
+		keywordEl.addEventListener("keydown", (event) => {
+			if (event.key === "Escape") {
+				keywordEl.value = "";
+				handleSearch();
+			}
+		});
+
+		clearBtnEl.addEventListener("click", () => {
+			if (!isUnlocked) {
+				return;
+			}
+			keywordEl.value = "";
+			keywordEl.focus();
+			handleSearch();
+		});
+
+		quickKeywordsEl.addEventListener("click", (event) => {
+			if (!isUnlocked) {
+				return;
+			}
+			const button = event.target.closest("button[data-key]");
+			if (!button) {
+				return;
+			}
+			keywordEl.value = button.dataset.key || "";
+			keywordEl.focus();
+			handleSearch();
+		});
+
+		function isEditableTarget(target) {
+			if (!target) {
+				return false;
+			}
+			return target.closest("input, textarea, [contenteditable='true']") !== null;
+		}
+
+		document.addEventListener("contextmenu", (event) => {
+			if (!isEditableTarget(event.target)) {
+				event.preventDefault();
+			}
+		});
+
+		document.addEventListener("copy", (event) => {
+			event.preventDefault();
+		});
+
+		document.addEventListener("cut", (event) => {
+			event.preventDefault();
+		});
+
+		document.addEventListener("selectstart", (event) => {
+			if (!isEditableTarget(event.target)) {
+				event.preventDefault();
+			}
+		});
+
+		window.addEventListener("keydown", (event) => {
+			const key = event.key.toLowerCase();
+			if ((event.ctrlKey || event.metaKey) && (key === "c" || key === "x" || key === "p")) {
+				event.preventDefault();
+			}
+			if (key === "printscreen") {
+				event.preventDefault();
+			}
+		});
+
+		window.addEventListener("beforeprint", () => {
+			document.body.style.display = "none";
+		});
+
+		unlockClearBtnEl.addEventListener("click", () => {
+			passwordInputEl.value = "";
+			passwordInputEl.focus();
+			unlockStatusEl.classList.remove("error");
+			unlockCardEl.classList.remove("scary");
+			unlockStatusEl.textContent = "Konten terkunci. Masukkan password untuk lanjut.";
+		});
+
+		unlockFormEl.addEventListener("submit", async (event) => {
+			event.preventDefault();
+			const password = passwordInputEl.value;
+			if (!password) {
+				unlockStatusEl.classList.add("error");
+				unlockStatusEl.textContent = "Password wajib diisi.";
+				return;
+			}
+
+			unlockStatusEl.classList.remove("error");
+			unlockStatusEl.textContent = "Memverifikasi akses...";
+			await loadQuestionsFromEncrypted(password);
+			if (isUnlocked) {
+				setUnlockedUI();
+			}
+		});
+
+		setLockedUI();
+		passwordInputEl.focus();
+	</script>
+</body>
+</html>
