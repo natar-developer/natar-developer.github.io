@@ -1,533 +1,260 @@
-<!doctype html>
-<html lang="id">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>Natar Developer Apps</title>
-	<meta name="description" content="Natar Developer application hub" />
-	<link rel="preconnect" href="https://fonts.googleapis.com" />
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-	<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet" />
-	<style>
-		:root {
-			--bg: #05070f;
-			--bg-soft: #0a1020;
-			--ink: #e8f0ff;
-			--muted: #9fb2da;
-			--line: rgba(112, 140, 197, 0.28);
-			--neon-cyan: #35f6df;
-			--neon-blue: #5cb5ff;
-			--neon-red: #ff4f7a;
-			--panel: rgba(8, 14, 28, 0.7);
-			--panel-strong: rgba(6, 11, 22, 0.84);
-			--shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
-		}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Natar Dev | Pixel Biorama Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --accent-color: #3b82f6;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+        }
 
-		* {
-			box-sizing: border-box;
-		}
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
 
-		html,
-		body {
-			margin: 0;
-			padding: 0;
-			min-height: 100%;
-			color: var(--ink);
-			font-family: "Exo 2", "Segoe UI", sans-serif;
-			background: radial-gradient(circle at 50% 0%, #0d1531 0%, transparent 50%),
-				linear-gradient(180deg, #02040a 0%, var(--bg) 50%, #010208 100%);
-			overflow-x: hidden;
-		}
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
 
-		#scene {
-			position: fixed;
-			inset: 0;
-			z-index: -2;
-			width: 100%;
-			height: 100%;
-			display: block;
-		}
+        /* Detail Pixel Canvas */
+        #canvas-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            image-rendering: pixelated;
+            background: #e2e8f0;
+        }
 
-		.bg-vignette {
-			position: fixed;
-			inset: 0;
-			pointer-events: none;
-			z-index: -1;
-			background: radial-gradient(circle at center, transparent 35%, rgba(0, 0, 0, 0.78) 88%);
-		}
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 80px 20px;
+            text-align: center;
+        }
 
-		.scanline {
-			position: fixed;
-			inset: 0;
-			pointer-events: none;
-			background: repeating-linear-gradient(to bottom, transparent 0 3px, rgba(255, 255, 255, 0.03) 4px 5px);
-			opacity: 0.2;
-			mix-blend-mode: soft-light;
-			animation: flicker 0.16s linear infinite;
-			z-index: 4;
-		}
+        /* Hero Section (Design 1) */
+        header { margin-bottom: 60px; perspective: 1000px; transition: transform 0.1s ease-out; }
+        h1 {
+            font-size: 3.5rem; font-weight: 800; letter-spacing: -2px;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #1e293b, #3b82f6);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        .tagline {
+            font-size: 1.1rem; color: var(--text-sub);
+            max-width: 600px; margin: 0 auto; line-height: 1.6;
+            background: rgba(255,255,255,0.4); padding: 10px; border-radius: 12px;
+        }
 
-		.wrap {
-			width: min(1680px, 96vw);
-			margin: 0 auto;
-			padding: 24px 0 72px;
-			position: relative;
-		}
-
-		.hero-grid {
-			display: grid;
-			grid-template-columns: minmax(520px, 1fr) minmax(320px, 0.56fr);
-			gap: 18px;
-		}
-
-		.panel {
-			position: relative;
-			border: 1px solid var(--line);
-			border-radius: 18px;
-			background: linear-gradient(170deg, rgba(13, 21, 40, 0.78) 0%, var(--panel) 100%);
-			box-shadow: var(--shadow);
-			overflow: hidden;
-			backdrop-filter: blur(4px);
-		}
-
-		.panel::before {
-			content: "";
-			position: absolute;
-			inset: 0;
-			background: linear-gradient(105deg, transparent 36%, rgba(92, 181, 255, 0.22) 46%, transparent 58%);
-			transform: translateX(-140%);
-			animation: wipe 6.2s ease-in-out infinite;
-			pointer-events: none;
-		}
-
-		.brand {
-			padding: clamp(22px, 3vw, 40px);
-			min-height: clamp(230px, 36vw, 460px);
-			display: grid;
-			align-items: center;
-			justify-items: center;
-		}
-
-		.brand::after {
-			content: "";
-			position: absolute;
-			inset: -30% auto auto -18%;
-			width: 340px;
-			height: 340px;
-			background: radial-gradient(circle, rgba(53, 246, 223, 0.24) 0%, rgba(53, 246, 223, 0) 72%);
-			filter: blur(10px);
-			animation: floatOrb 8s ease-in-out infinite;
-			z-index: -1;
-		}
-
-		.brand-inner {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			gap: 16px;
-		}
-
-		.logo-box {
-			position: relative;
-			padding: 3px;
-			border-radius: 24px;
-			background: conic-gradient(from 0deg, var(--neon-cyan), var(--neon-blue), var(--neon-red), var(--neon-cyan));
-			box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14), 0 0 34px rgba(92, 181, 255, 0.25);
-		}
-
-		.logo {
-			display: block;
-			width: clamp(88px, 11vw, 150px);
-			height: clamp(88px, 11vw, 150px);
-			object-fit: cover;
-			border-radius: 20px;
-			background: #040812;
-			border: 1px solid rgba(255, 255, 255, 0.2);
-			animation: pulseLogo 3.4s ease-in-out infinite;
-		}
-
-		.brand-tag {
-			margin: 0;
-			font-family: "Rajdhani", sans-serif;
-			font-weight: 700;
-			letter-spacing: 0.12em;
-			text-transform: uppercase;
-			font-size: 0.84rem;
-			color: var(--muted);
-		}
-
-		.side {
-			padding: clamp(16px, 2vw, 24px);
-			background: linear-gradient(170deg, rgba(14, 22, 40, 0.95) 0%, var(--panel-strong) 100%);
-			display: grid;
-			align-content: stretch;
-			gap: 12px;
-		}
-
-		.status {
-			display: grid;
-			grid-template-columns: 1fr;
-			gap: 10px;
-		}
-
-		.status-line {
-			padding: 10px 12px;
-			border-radius: 10px;
-			border: 1px solid rgba(92, 181, 255, 0.28);
-			background: rgba(10, 16, 29, 0.8);
-			animation: riseIn 750ms ease both;
-			font-family: "Rajdhani", sans-serif;
-			font-size: 0.95rem;
-			letter-spacing: 0.06em;
-			text-transform: uppercase;
-		}
-
-		.status-line span {
-			color: var(--neon-cyan);
-		}
-
-		.mini-logo {
-			justify-self: center;
-			width: clamp(64px, 8vw, 94px);
-			height: clamp(64px, 8vw, 94px);
-			object-fit: cover;
-			border-radius: 14px;
-			border: 1px solid rgba(255, 255, 255, 0.2);
-			box-shadow: 0 0 28px rgba(53, 246, 223, 0.22);
-		}
-
-		.pulse-line {
-			height: 10px;
-			border-radius: 999px;
-			background: rgba(92, 181, 255, 0.18);
-			overflow: hidden;
-		}
-
-		.pulse-line::before {
-			content: "";
-			display: block;
-			height: 100%;
-			width: 38%;
-			background: linear-gradient(90deg, var(--neon-cyan), var(--neon-blue));
-			box-shadow: 0 0 22px rgba(53, 246, 223, 0.9);
-			animation: progressPulse 2.8s ease-in-out infinite;
-		}
-
-		.apps-wrap {
-			margin-top: 18px;
-			position: relative;
-		}
-
-		.apps {
-			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
-			gap: 16px;
-		}
-
-		.app-card {
-			display: block;
-			text-decoration: none;
-			color: inherit;
-			position: relative;
-			padding: 20px;
-			border-radius: 18px;
-			background: linear-gradient(170deg, rgba(14, 23, 42, 0.92), rgba(8, 13, 25, 0.96));
-			border: 1px solid rgba(112, 140, 197, 0.3);
-			box-shadow: 0 16px 38px rgba(0, 0, 0, 0.44);
-			overflow: hidden;
-			opacity: 0;
-			transform: translateY(22px) scale(0.98);
-			animation: cardIn 780ms ease forwards;
-			transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
-		}
-
-		.app-card::before {
-			content: "";
-			position: absolute;
-			inset: 0;
-			background: radial-gradient(circle at top right, rgba(53, 246, 223, 0.18), transparent 45%);
-			opacity: 0;
-			transition: opacity 220ms ease;
-		}
-
-		.app-card:nth-child(1) {
-			animation-delay: 180ms;
-		}
-
-		.app-card:hover,
-		.app-card:focus-visible {
-			transform: translateY(-6px) scale(1.01);
-			border-color: rgba(53, 246, 223, 0.68);
-			box-shadow: 0 20px 42px rgba(6, 170, 160, 0.25);
-			outline: none;
-		}
-
-		.app-card:hover::before,
-		.app-card:focus-visible::before {
-			opacity: 1;
-		}
-
-		.app-badge {
-			width: fit-content;
-			margin: 0 0 12px;
-			padding: 4px 10px;
-			border-radius: 999px;
-			font-size: 0.76rem;
-			font-family: "Rajdhani", sans-serif;
-			font-weight: 700;
-			letter-spacing: 0.08em;
-			text-transform: uppercase;
-			color: #031013;
-			background: linear-gradient(90deg, var(--neon-cyan), var(--neon-blue));
-		}
-
-		.app-title {
-			margin: 0;
-			font-family: "Rajdhani", sans-serif;
-			font-size: clamp(1.3rem, 2.1vw, 1.7rem);
-			text-transform: uppercase;
-		}
-
-		.app-desc {
-			margin: 9px 0 0;
-			color: var(--muted);
-			line-height: 1.66;
-		}
-
-		.cta {
-			margin-top: 14px;
-			font-family: "Rajdhani", sans-serif;
-			font-size: 1.02rem;
-			font-weight: 700;
-			letter-spacing: 0.04em;
-			color: var(--neon-cyan);
-		}
-
-		.footer {
-			margin-top: 20px;
-			padding: 12px 14px;
-			border-radius: 12px;
-			font-size: 0.9rem;
-			color: #9ab0d8;
-			border: 1px solid rgba(112, 140, 197, 0.2);
-			background: rgba(7, 12, 22, 0.56);
-		}
-
-		@media (max-width: 980px) {
-			.wrap {
-				width: min(1180px, 94vw);
-			}
-
-			.hero-grid {
-				grid-template-columns: 1fr;
-			}
-		}
-
-		@media (max-width: 620px) {
-			.scanline {
-				opacity: 0.12;
-			}
-
-			.apps {
-				grid-template-columns: 1fr;
-			}
-		}
-
-		@media (prefers-reduced-motion: reduce) {
-			*,
-			*::before,
-			*::after {
-				animation: none !important;
-				transition: none !important;
-			}
-		}
-
-		@keyframes flicker {
-			0% { opacity: 0.22; }
-			50% { opacity: 0.2; }
-			100% { opacity: 0.24; }
-		}
-
-		@keyframes wipe {
-			0% { transform: translateX(-140%); }
-			38% { transform: translateX(130%); }
-			100% { transform: translateX(130%); }
-		}
-
-		@keyframes floatOrb {
-			0%,
-			100% { transform: translateY(0); }
-			50% { transform: translateY(-16px); }
-		}
-
-		@keyframes pulseLogo {
-			0%,
-			100% { transform: scale(1); }
-			50% { transform: scale(1.05); }
-		}
-
-		@keyframes riseIn {
-			from {
-				opacity: 0;
-				transform: translateY(14px);
-			}
-			to {
-				opacity: 1;
-				transform: translateY(0);
-			}
-		}
-
-		@keyframes progressPulse {
-			0% { transform: translateX(-5%); }
-			50% { transform: translateX(125%); }
-			100% { transform: translateX(-5%); }
-		}
-
-		@keyframes cardIn {
-			from {
-				opacity: 0;
-				transform: translateY(22px) scale(0.98);
-			}
-			to {
-				opacity: 1;
-				transform: translateY(0) scale(1);
-			}
-		}
-	</style>
+        /* App Grid (Design 1) */
+        .app-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 50px; }
+        .app-card {
+            background: var(--card-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 24px;
+            padding: 40px 30px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer; position: relative; overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03); transform-style: preserve-3d;
+        }
+        .app-card:hover { box-shadow: 0 20px 40px rgba(59, 130, 246, 0.15); border-color: var(--accent-color); }
+        .app-icon { font-size: 40px; margin-bottom: 20px; display: inline-block; }
+        h3 { font-size: 1.5rem; margin-bottom: 12px; }
+        p.description { font-size: 0.95rem; color: var(--text-sub); margin-bottom: 25px; }
+        .btn-launch {
+            display: inline-block; padding: 12px 24px; background: var(--text-main);
+            color: white; text-decoration: none; border-radius: 12px;
+            font-weight: 600; font-size: 0.9rem; transition: 0.3s;
+        }
+        .app-card:hover .btn-launch { background: var(--accent-color); transform: translateZ(20px); }
+        footer { margin-top: 100px; color: var(--text-sub); font-size: 0.85rem; padding-bottom: 40px; }
+    </style>
 </head>
 <body>
-	<canvas id="scene" aria-hidden="true"></canvas>
-	<div class="bg-vignette" aria-hidden="true"></div>
-	<div class="scanline" aria-hidden="true"></div>
 
-	<main class="wrap">
-		<section class="hero-grid">
-			<article class="panel brand">
-				<div class="brand-inner">
-					<div class="logo-box">
-						<img class="logo" src="natar-dev.png" alt="Logo Natar Developer" />
-					</div>
-					<p class="brand-tag">Natar Developer</p>
-				</div>
-			</article>
+    <canvas id="canvas-bg"></canvas>
 
-			<aside class="panel side">
-				<img class="mini-logo" src="natar-dev.png" alt="Natar Dev" />
-				<div class="status">
-					<div class="status-line">Apps: <span>01</span></div>
-					<div class="status-line">Mode: <span>Online</span></div>
-					<div class="status-line">Theme: <span>Dark</span></div>
-				</div>
-				<div class="pulse-line" aria-hidden="true"></div>
-			</aside>
-		</section>
+    <div class="container">
+        <header id="hero">
+            <h1>NATAR HUB</h1>
+            <p class="tagline">
+                Honestly, ini tuh basecamp-nya <b>Natar Developer</b> buat spill aplikasi sederhana kita. No ribet-ribet club, just simple apps with good vibes.
+            </p>
+        </header>
 
-		<section class="apps-wrap" aria-label="Daftar aplikasi">
-			<div class="apps">
-				<a class="app-card" href="apps/financial_goals_tracker.html">
-					<p class="app-badge">Web App</p>
-					<h2 class="app-title">Financial Goals Tracker</h2>
-					<p class="app-desc">Aplikasi untuk mengatur target keuangan, memantau progres tabungan, dan menjaga rencana tetap on track.</p>
-					<p class="cta">Launch App -></p>
-				</a>
-			</div>
+        <main class="app-grid">
+            <div class="app-card" data-tilt>
+                <span class="app-icon">🚀</span>
+                <h3>Project Alpha</h3>
+                <p class="description">Literally cuma tools simpel buat bantu daily task lo jadi lebih sat-set-sat-set.</p>
+                <a href="#" class="btn-launch">Open App</a>
+            </div>
+            <div class="app-card" data-tilt>
+                <span class="app-icon">🎮</span>
+                <h3>Mini Games</h3>
+                <p class="description">Kalau lagi burnout, mending main ini bentar. Casual bgt buat kill time.</p>
+                <a href="#" class="btn-launch">Play Now</a>
+            </div>
+            <div class="app-card" data-tilt>
+                <span class="app-icon">💡</span>
+                <h3>Idea Box</h3>
+                <p class="description">Tempat kita naruh coretan ide yang (semoga) useful buat lo semua.</p>
+                <a href="#" class="btn-launch">Explore</a>
+            </div>
+        </main>
 
-			<p class="footer">Aplikasi baru bisa ditambahkan kapan saja di folder apps, lalu ditampilkan sebagai card berikutnya.</p>
-		</section>
-	</main>
+        <footer>&copy; 2026 Natar Developer. Crafted with love and coffee.</footer>
+    </div>
 
-	<script>
-		const canvas = document.getElementById("scene");
-		const ctx = canvas.getContext("2d", { alpha: true });
-		const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    <script>
+        const canvas = document.getElementById('canvas-bg');
+        const ctx = canvas.getContext('2d');
+        const P_SIZE = 4; // Pixel scale
 
-		let width = 0;
-		let height = 0;
-		let centerX = 0;
-		let centerY = 0;
-		let pointerX = 0;
-		let pointerY = 0;
-		let stars = [];
+        let w, h, cols, rows;
+        let terrain = [];
 
-		function resize() {
-			width = canvas.width = window.innerWidth;
-			height = canvas.height = window.innerHeight;
-			centerX = width * 0.5;
-			centerY = height * 0.5;
-			const count = Math.max(120, Math.floor((width * height) / 15000));
-			stars = Array.from({ length: count }, () => ({
-				x: (Math.random() - 0.5) * width * 1.8,
-				y: (Math.random() - 0.5) * height * 1.8,
-				z: Math.random() * 1.2 + 0.2,
-				speed: Math.random() * 0.012 + 0.004,
-				size: Math.random() * 1.6 + 0.4
-			}));
-		}
+        function initCanvas() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+            cols = Math.ceil(w / (P_SIZE * 5));
+            rows = Math.ceil(h / (P_SIZE * 5));
+            
+            // Buat terrain (rumput & bunga statis) biar lebih detail
+            terrain = [];
+            for(let i=0; i<150; i++) {
+                terrain.push({
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    type: Math.random() > 0.8 ? 'flower' : 'grass',
+                    color: Math.random() > 0.5 ? '#bbdefb' : '#90caf9'
+                });
+            }
+        }
 
-		function draw(time) {
-			ctx.clearRect(0, 0, width, height);
-			ctx.fillStyle = "rgba(2, 5, 12, 0.2)";
-			ctx.fillRect(0, 0, width, height);
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
 
-			const swayX = (pointerX - centerX) * 0.0006;
-			const swayY = (pointerY - centerY) * 0.0006;
+        // --- Organisms ---
+        class Snake {
+            constructor() {
+                this.seg = [];
+                for(let i=0; i<12; i++) this.seg.push({x: w/4, y: h/4});
+                this.angle = 0;
+            }
+            update(target) {
+                let head = this.seg[0];
+                let dx = target.x - head.x;
+                let dy = target.y - head.y;
+                let angleToTarget = Math.atan2(dy, dx);
+                
+                head.x += Math.cos(angleToTarget) * 2;
+                head.y += Math.sin(angleToTarget) * 2;
 
-			for (let i = 0; i < stars.length; i++) {
-				const s = stars[i];
-				s.z -= s.speed;
-				if (s.z <= 0.08) {
-					s.x = (Math.random() - 0.5) * width * 1.8;
-					s.y = (Math.random() - 0.5) * height * 1.8;
-					s.z = 1.2;
-				}
+                for(let i=this.seg.length-1; i>0; i--) {
+                    this.seg[i].x += (this.seg[i-1].x - this.seg[i].x) * 0.4;
+                    this.seg[i].y += (this.seg[i-1].y - this.seg[i].y) * 0.4;
+                }
+            }
+            draw() {
+                this.seg.forEach((s, i) => {
+                    ctx.fillStyle = i === 0 ? '#1e293b' : `rgba(59, 130, 246, ${1 - i/15})`;
+                    ctx.fillRect(Math.floor(s.x/P_SIZE)*P_SIZE, Math.floor(s.y/P_SIZE)*P_SIZE, P_SIZE*2, P_SIZE*2);
+                });
+            }
+        }
 
-				const perspective = 280 / s.z;
-				const sx = centerX + (s.x + swayX * perspective * 120) * perspective * 0.0032;
-				const sy = centerY + (s.y + swayY * perspective * 120) * perspective * 0.0032;
+        class Prey {
+            constructor(color) {
+                this.x = Math.random() * w;
+                this.y = Math.random() * h;
+                this.color = color;
+                this.vx = Math.random() - 0.5;
+                this.vy = Math.random() - 0.5;
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                if(this.x < 0 || this.x > w) this.vx *= -1;
+                if(this.y < 0 || this.y > h) this.vy *= -1;
+                if(Math.random() < 0.01) { this.vx = (Math.random()-0.5)*3; this.vy = (Math.random()-0.5)*3; }
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(Math.floor(this.x/P_SIZE)*P_SIZE, Math.floor(this.y/P_SIZE)*P_SIZE, P_SIZE*2, P_SIZE*2);
+            }
+        }
 
-				if (sx < -60 || sx > width + 60 || sy < -60 || sy > height + 60) {
-					continue;
-				}
+        const predator = new Snake();
+        const frog = new Prey('#4ade80');
+        const bigFish = new Prey('#fb923c');
+        const smallFish = Array.from({length: 8}, () => new Prey('#60a5fa'));
 
-				const size = s.size * (1.8 - s.z);
-				const alpha = Math.min(0.9, 1.2 - s.z * 0.55);
-				ctx.beginPath();
-				ctx.fillStyle = `rgba(120, 220, 255, ${alpha})`;
-				ctx.arc(sx, sy, Math.max(0.5, size), 0, Math.PI * 2);
-				ctx.fill();
+        function drawScene() {
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(0, 0, w, h);
 
-				ctx.beginPath();
-				ctx.strokeStyle = `rgba(53, 246, 223, ${alpha * 0.35})`;
-				ctx.lineWidth = 1;
-				ctx.moveTo(sx, sy);
-				ctx.lineTo(sx + (s.x * 0.01), sy + (s.y * 0.01));
-				ctx.stroke();
-			}
+            // Draw Terrain Detail
+            terrain.forEach(t => {
+                ctx.fillStyle = t.color;
+                ctx.globalAlpha = 0.3;
+                ctx.fillRect(Math.floor(t.x/P_SIZE)*P_SIZE, Math.floor(t.y/P_SIZE)*P_SIZE, P_SIZE, t.type === 'grass' ? P_SIZE*2 : P_SIZE);
+                ctx.globalAlpha = 1.0;
+            });
 
-			const pulse = (Math.sin(time * 0.0012) + 1) * 0.5;
-			const glow = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, Math.max(width, height) * 0.7);
-			glow.addColorStop(0, `rgba(53,246,223,${0.08 + pulse * 0.04})`);
-			glow.addColorStop(1, "rgba(0,0,0,0)");
-			ctx.fillStyle = glow;
-			ctx.fillRect(0, 0, width, height);
+            // Update & Draw Agents
+            frog.update();
+            frog.draw();
 
-			if (!reduceMotion) {
-				requestAnimationFrame(draw);
-			}
-		}
+            predator.update(frog);
+            predator.draw();
 
-		resize();
-		if (reduceMotion) {
-			draw(0);
-		} else {
-			requestAnimationFrame(draw);
-		}
+            bigFish.update();
+            bigFish.draw();
+            
+            smallFish.forEach(sf => {
+                // Ikan kecil kabur dari ikan besar
+                let d = Math.hypot(sf.x - bigFish.x, sf.y - bigFish.y);
+                if(d < 80) {
+                    sf.vx = (sf.x - bigFish.x) * 0.05;
+                    sf.vy = (sf.y - bigFish.y) * 0.05;
+                }
+                sf.update();
+                sf.draw();
+            });
 
-		window.addEventListener("resize", resize);
-		window.addEventListener("pointermove", (event) => {
-			pointerX = event.clientX;
-			pointerY = event.clientY;
-		});
-	</script>
+            requestAnimationFrame(drawScene);
+        }
+        drawScene();
+
+        // --- Parallax (Design 1 style) ---
+        const cards = document.querySelectorAll('.app-card');
+        document.addEventListener('mousemove', (e) => {
+            const { clientX, clientY } = e;
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            
+            const moveX = (clientX - centerX) / 60;
+            const moveY = (clientY - centerY) / 60;
+            document.getElementById('hero').style.transform = `rotateX(${-moveY}deg) rotateY(${moveX}deg)`;
+
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const cardX = clientX - rect.left - rect.width / 2;
+                const cardY = clientY - rect.top - rect.height / 2;
+                if (Math.abs(cardX) < 400 && Math.abs(cardY) < 400) {
+                    card.style.transform = `perspective(1000px) rotateX(${(cardY/rect.height)*10}deg) rotateY(${(cardX/rect.width)*-10}deg) translateY(-5px)`;
+                } else {
+                    card.style.transform = `none`;
+                }
+            });
+        });
+    </script>
 </body>
 </html>
