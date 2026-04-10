@@ -53,6 +53,24 @@
 			overflow-x: hidden;
 		}
 
+		body.unlocked {
+			--panel: rgba(248, 255, 252, 0.97);
+			--panel-strong: #ffffff;
+			--line: #b5d8c6;
+			--text: #0f2a20;
+			--text-soft: #356a54;
+			--highlight: #adffd5;
+			--shadow: 0 14px 34px rgba(18, 76, 49, 0.09);
+			background: #ffffff;
+			font-family: "Cascadia Code", "Consolas", "Lucida Console", "Courier New", monospace;
+		}
+
+		body.unlocked::before,
+		body.unlocked::after {
+			opacity: 0;
+			animation: none;
+		}
+
 		body.locked .wrap {
 			display: none;
 		}
@@ -108,6 +126,7 @@
 		.wrap {
 			width: min(1120px, 94vw);
 			margin: 12px auto 22px;
+			position: relative;
 		}
 
 		.topbar {
@@ -124,6 +143,27 @@
 			top: 8px;
 			z-index: 10;
 			animation: appearUp 0.5s ease;
+		}
+
+		body.unlocked .topbar {
+			backdrop-filter: blur(4px);
+			background: #ffffff;
+			box-shadow:
+				0 0 0 1px rgba(58, 151, 106, 0.22),
+				0 0 0 4px rgba(42, 182, 127, 0.05),
+				var(--shadow);
+		}
+
+		body.unlocked .brand-caption,
+		body.unlocked .headline p,
+		body.unlocked .meta {
+			color: #2f6d53;
+		}
+
+		body.unlocked .headline h1 {
+			color: #114531;
+			text-shadow: 0 0 10px rgba(92, 214, 142, 0.2);
+			letter-spacing: 0.01em;
 		}
 
 		@keyframes appearUp {
@@ -193,6 +233,29 @@
 			transition: border-color 0.2s ease, box-shadow 0.2s ease;
 		}
 
+		body.unlocked .search-box {
+			background: #ffffff;
+			border-color: #98cdb0;
+		}
+
+		body.unlocked .search-box:focus-within {
+			border-color: #1f9b65;
+			box-shadow: 0 0 0 4px rgba(66, 179, 115, 0.18);
+		}
+
+		body.unlocked .search-icon {
+			background: linear-gradient(135deg, #e6fff2, #f5fffa);
+			color: #008f58;
+		}
+
+		body.unlocked .search-box input {
+			color: #123a2a;
+		}
+
+		body.unlocked .search-box input::placeholder {
+			color: #5f9b7f;
+		}
+
 		.search-box:focus-within {
 			border-color: #8ab7ff;
 			box-shadow: 0 0 0 4px rgba(32, 129, 255, 0.13);
@@ -237,6 +300,17 @@
 			transition: all 0.2s ease;
 		}
 
+		body.unlocked .clear-btn {
+			border-color: #72c098;
+			background: #e9fff2;
+			color: #076a3e;
+		}
+
+		body.unlocked .clear-btn:hover {
+			background: #d9ffea;
+			border-color: #2ba76e;
+		}
+
 		.clear-btn:hover {
 			background: #f4f8ff;
 			border-color: #bdd4ff;
@@ -262,6 +336,13 @@
 			box-shadow: 0 10px 18px rgba(255, 186, 44, 0.26);
 		}
 
+		body.unlocked .warning-note {
+			background: linear-gradient(125deg, #ffe7ea, #ffd3d9 62%, #ffc2cd);
+			border-color: #de4966;
+			color: #7f1528;
+			box-shadow: 0 10px 18px rgba(165, 27, 60, 0.2);
+		}
+
 		.quick-key {
 			border: 1px solid #d8e4f9;
 			background: linear-gradient(135deg, #ffffff, #f7faff);
@@ -273,6 +354,17 @@
 			font-weight: 600;
 			transition: transform 0.15s ease, border-color 0.2s ease;
 			white-space: nowrap;
+		}
+
+		body.unlocked .quick-key {
+			border-color: #90cdb0;
+			background: #f5fff9;
+			color: #0e6940;
+		}
+
+		body.unlocked .quick-key:hover {
+			border-color: #20a36b;
+			box-shadow: 0 0 0 3px rgba(43, 173, 114, 0.12);
 		}
 
 		.quick-key:hover {
@@ -302,6 +394,11 @@
 			animation-delay: calc(var(--delay, 0) * 80ms);
 		}
 
+		body.unlocked .card {
+			background: #ffffff;
+			border-color: #afd7c2;
+		}
+
 		@keyframes cardIn {
 			to {
 				opacity: 1;
@@ -321,6 +418,12 @@
 			align-items: center;
 		}
 
+		body.unlocked .card-head {
+			background: linear-gradient(120deg, #f2fff8, #ffffff 50%, #f2fcff);
+			border-bottom-color: #a4d3bc;
+			color: #21664a;
+		}
+
 		.paper-tag {
 			background: linear-gradient(135deg, #eff4ff, #f7fbff);
 			border: 1px solid #cedfff;
@@ -331,6 +434,31 @@
 			font-weight: 800;
 			text-transform: uppercase;
 			letter-spacing: 0.08em;
+		}
+
+		body.unlocked .paper-tag,
+		body.unlocked .chip {
+			background: linear-gradient(135deg, #e7fff0, #dcfff2 60%, #e4f4ff);
+			border-color: #83c5a4;
+			color: #155d40;
+		}
+
+		body.unlocked .chip:nth-of-type(2) {
+			background: linear-gradient(135deg, #e6fff4, #d8fff0);
+			border-color: #61bd93;
+			color: #0d6a40;
+		}
+
+		body.unlocked .chip:nth-of-type(3) {
+			background: linear-gradient(135deg, #e8f4ff, #defcff);
+			border-color: #79b5d8;
+			color: #145979;
+		}
+
+		body.unlocked .chip:nth-of-type(4) {
+			background: linear-gradient(135deg, #f0ebff, #e8f2ff);
+			border-color: #9ca7e1;
+			color: #37458b;
 		}
 
 		.chip {
@@ -355,6 +483,16 @@
 				);
 		}
 
+		body.unlocked .card-body {
+			background: repeating-linear-gradient(
+				180deg,
+				#ffffff,
+				#ffffff 30px,
+				#f7fdfa 31px,
+				#f7fdfa 32px
+			);
+		}
+
 		.question {
 			margin: 0 0 8px;
 			font-size: 0.95rem;
@@ -373,6 +511,11 @@
 			text-transform: uppercase;
 			background: #e8f2ff;
 			color: #29538f;
+		}
+
+		body.unlocked .question-label {
+			background: linear-gradient(135deg, #ddffea, #ecfff5);
+			color: #0d6740;
 		}
 
 		.options {
@@ -396,6 +539,18 @@
 			align-items: start;
 		}
 
+		body.unlocked .option {
+			border-color: #aad4bf;
+			background: linear-gradient(130deg, #ffffff, #f4fbf7);
+			color: #164d36;
+		}
+
+		body.unlocked .option-label {
+			border-color: #7ec5a0;
+			background: #e7fdf0;
+			color: #0d7144;
+		}
+
 		.option-label {
 			display: grid;
 			place-items: center;
@@ -416,6 +571,12 @@
 			font-weight: 600;
 		}
 
+		body.unlocked .option.correct {
+			border-color: #33ad6d;
+			background: rgba(79, 198, 128, 0.18);
+			color: #0d5737;
+		}
+
 		.option.correct .option-label {
 			border-color: #7bcc9e;
 			background: #d7f2e4;
@@ -431,6 +592,12 @@
 			padding: 7px 8px;
 			font-size: 0.83rem;
 			font-weight: 600;
+		}
+
+		body.unlocked .answer {
+			border-color: #3dae71;
+			background: linear-gradient(120deg, #f0fff6, #e6f8ee);
+			color: #0f5638;
 		}
 
 		mark {
@@ -449,6 +616,130 @@
 			color: var(--text-soft);
 			font-weight: 500;
 			box-shadow: var(--shadow);
+		}
+
+		body.unlocked .notice {
+			border-style: solid;
+			border-color: #86c8a6;
+			background: linear-gradient(120deg, #f4fffa, #ebfaf2);
+			color: #21664a;
+		}
+
+		.loader-panel {
+			border: 1px solid #7ec7a2;
+			border-radius: 12px;
+			padding: 12px;
+			background: linear-gradient(135deg, #f5fffa, #e9faf1 55%, #eaf6ff);
+			box-shadow: inset 0 0 0 1px rgba(52, 168, 108, 0.2);
+			display: grid;
+			gap: 10px;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.loader-panel::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: -30%;
+			width: 30%;
+			height: 100%;
+			background: linear-gradient(90deg, transparent, rgba(88, 231, 147, 0.35), transparent);
+			animation: sweepLine 2.9s ease-in-out infinite;
+		}
+
+		.loader-title {
+			font-family: "Consolas", "Courier New", monospace;
+			font-size: 0.84rem;
+			letter-spacing: 0.04em;
+			color: #0e6640;
+		}
+
+		.loader-track {
+			height: 7px;
+			border-radius: 999px;
+			overflow: hidden;
+			background: rgba(70, 167, 113, 0.26);
+		}
+
+		.loader-bar {
+			height: 100%;
+			width: 32%;
+			background: linear-gradient(90deg, transparent, #34bd72, #7de1a8, transparent);
+			animation: packetFlow 1.8s cubic-bezier(0.32, 0.12, 0.2, 0.97) infinite;
+		}
+
+		.loader-logs {
+			display: grid;
+			gap: 4px;
+			font-family: "Consolas", "Courier New", monospace;
+			font-size: 0.73rem;
+			color: #1f734f;
+		}
+
+		.loader-log-line::before {
+			content: "> ";
+			color: #0f9a5d;
+		}
+
+		.loader-log-line {
+			opacity: 0.2;
+			animation: logReveal 2.2s ease-in-out infinite;
+		}
+
+		.loader-logs .loader-log-line:nth-child(2) {
+			animation-delay: 0.45s;
+		}
+
+		.loader-logs .loader-log-line:nth-child(3) {
+			animation-delay: 0.9s;
+		}
+
+		.loader-dot::after {
+			content: "";
+			animation: dotPulse 1.25s steps(4, end) infinite;
+		}
+
+		@keyframes packetFlow {
+			from {
+				transform: translateX(-125%);
+			}
+			to {
+				transform: translateX(300%);
+			}
+		}
+
+		@keyframes logReveal {
+			0%,
+			100% {
+				opacity: 0.18;
+				transform: translateX(0);
+			}
+			20% {
+				opacity: 0.8;
+				transform: translateX(1px);
+			}
+			55% {
+				opacity: 1;
+				transform: translateX(0);
+			}
+		}
+
+		@keyframes sweepLine {
+			from {
+				left: -34%;
+			}
+			to {
+				left: 118%;
+			}
+		}
+
+		@keyframes dotPulse {
+			0% { content: ""; }
+			25% { content: "."; }
+			50% { content: ".."; }
+			75% { content: "..."; }
+			100% { content: ""; }
 		}
 
 		.error {
@@ -739,9 +1030,12 @@
 	<script>
 		const MAX_RESULTS = 5;
 		const SEARCH_DELAY = 180;
+		const HACKER_BOOT_DELAY = 1650;
+		const SEARCH_LOADING_DELAY = 1420;
 		let questionBank = [];
 		let debounceTimer = null;
 		let isUnlocked = false;
+		let searchRequestId = 0;
 
 		const unlockOverlayEl = document.getElementById("unlockOverlay");
 		const unlockCardEl = unlockOverlayEl.querySelector(".unlock-card");
@@ -903,6 +1197,25 @@
 			resultsEl.innerHTML = `<div class="notice ${isError ? "error" : ""}">${message}</div>`;
 		}
 
+		function renderLoadingState(keyword) {
+			const keywordText = stripHtml(keyword || "query");
+			const requestTag = Math.random().toString(16).slice(2, 10).toUpperCase();
+			const shardId = Math.floor(Math.random() * 7) + 1;
+			resultsEl.innerHTML = `
+				<div class="loader-panel">
+					<div class="loader-title">[REMOTE-LINK] Pulling payload "${keywordText}" | trace ${requestTag}<span class="loader-dot"></span></div>
+					<div class="loader-track">
+						<div class="loader-bar"></div>
+					</div>
+					<div class="loader-logs">
+						<div class="loader-log-line">Handshake accepted: relay-node-${shardId}.mirror.internal</div>
+						<div class="loader-log-line">Decrypting segmented packet stream [AES-256-GCM]</div>
+						<div class="loader-log-line">Integrity check passed. Preparing result snapshot.</div>
+					</div>
+				</div>
+			`;
+		}
+
 		function renderCards(list, keyword) {
 			if (!list.length) {
 				renderMessage("Tidak ada data yang cocok dengan kata kunci tersebut.");
@@ -949,17 +1262,26 @@
 				.join("");
 		}
 
-		function handleSearch() {
+		async function handleSearch() {
 			if (!isUnlocked) {
 				renderMessage("Masukkan password untuk membuka bank data.");
 				return;
 			}
 
 			const keyword = keywordEl.value.trim();
+			const requestId = ++searchRequestId;
 
 			if (!keyword) {
 				renderMessage("Ketik kata kunci untuk mulai mencari data.");
 				metaEl.textContent = `Menampilkan hasil secara otomatis. Total bank data: ${questionBank.length}.`;
+				return;
+			}
+
+			metaEl.textContent = `Memindai data untuk kata kunci "${keyword}"...`;
+			renderLoadingState(keyword);
+			await sleep(SEARCH_LOADING_DELAY);
+
+			if (requestId !== searchRequestId) {
 				return;
 			}
 
@@ -977,7 +1299,7 @@
 		function handleSearchDebounced() {
 			clearTimeout(debounceTimer);
 			debounceTimer = setTimeout(() => {
-				handleSearch();
+				void handleSearch();
 			}, SEARCH_DELAY);
 		}
 
@@ -1024,24 +1346,35 @@
 			}
 		}
 
+		function setSearchControlsEnabled(enabled) {
+			keywordEl.disabled = !enabled;
+			clearBtnEl.disabled = !enabled;
+			quickKeywordsEl.querySelectorAll("button").forEach((btn) => {
+				btn.disabled = !enabled;
+			});
+		}
+
 		function setLockedUI() {
 			document.body.classList.add("locked");
-			keywordEl.disabled = true;
-			clearBtnEl.disabled = true;
-			quickKeywordsEl.querySelectorAll("button").forEach((btn) => {
-				btn.disabled = true;
-			});
+			document.body.classList.remove("unlocked");
+			setSearchControlsEnabled(false);
 			metaEl.textContent = "Konten terkunci. Masukkan password untuk membuka akses.";
 			renderMessage("Konten terkunci. Masukkan password terlebih dahulu.");
 		}
 
 		function setUnlockedUI() {
 			document.body.classList.remove("locked");
-			keywordEl.disabled = false;
-			clearBtnEl.disabled = false;
-			quickKeywordsEl.querySelectorAll("button").forEach((btn) => {
-				btn.disabled = false;
-			});
+			document.body.classList.add("unlocked");
+			setSearchControlsEnabled(true);
+		}
+
+		async function runHackerBootSequence() {
+			setSearchControlsEnabled(false);
+			metaEl.textContent = "Secure bridge established. Menyiapkan terminal data...";
+			renderLoadingState("session-init");
+			await sleep(HACKER_BOOT_DELAY);
+			setSearchControlsEnabled(true);
+			renderMessage("Terminal siap. Cari data untuk memulai pemindaian jaringan.");
 		}
 
 		keywordEl.addEventListener("input", () => {
@@ -1059,9 +1392,10 @@
 			if (!isUnlocked) {
 				return;
 			}
+			searchRequestId += 1;
 			keywordEl.value = "";
 			keywordEl.focus();
-			handleSearch();
+			void handleSearch();
 		});
 
 		quickKeywordsEl.addEventListener("click", (event) => {
@@ -1074,7 +1408,7 @@
 			}
 			keywordEl.value = button.dataset.key || "";
 			keywordEl.focus();
-			handleSearch();
+			void handleSearch();
 		});
 
 		function isEditableTarget(target) {
@@ -1140,6 +1474,7 @@
 			await loadQuestionsFromEncrypted(password);
 			if (isUnlocked) {
 				setUnlockedUI();
+				await runHackerBootSequence();
 			}
 		});
 
