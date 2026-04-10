@@ -697,12 +697,12 @@
 					<img class="brand-logo" src="../../natar-dev.png" alt="Logo Natar Dev" />
 					<div>
 						<div class="brand-caption">Natar Developer</div>
-						<h1>Pencarian Soal</h1>
+						<h1>Pencarian Data</h1>
 					</div>
 				</div>
 				<p>
 					Hasil diperbarui otomatis setiap kali kata kunci berubah dengan menampilkan maksimal
-					5 soal teratas.
+					5 data teratas.
 				</p>
 			</div>
 
@@ -726,11 +726,11 @@
 			</div>
 
 			<div class="warning-note">
-				PERHATIAN: Urutan pilihan jawaban di halaman ini mungkin acak/random sehingga
-				bisa berbeda dari urutan pilihan pada aplikasi ujian sesungguhnya.
+				PERHATIAN: Urutan pilihan jawaban di halaman ini mungkin random sehingga
+				bisa berbeda dari urutan pilihan pada aplikasi ujian anda.
 			</div>
 
-			<div id="meta" class="meta">Memuat bank soal...</div>
+			<div id="meta" class="meta">Memuat bank data...</div>
 		</section>
 
 		<section id="results" class="results"></section>
@@ -905,7 +905,7 @@
 
 		function renderCards(list, keyword) {
 			if (!list.length) {
-				renderMessage("Tidak ada soal yang cocok dengan kata kunci tersebut.");
+				renderMessage("Tidak ada data yang cocok dengan kata kunci tersebut.");
 				return;
 			}
 
@@ -932,8 +932,8 @@
 					return `
 						<article class="card" style="--delay:${index}">
 							<div class="card-head">
-								<span class="paper-tag">Soal #${index + 1}</span>
-								<span class="chip">ID Soal: ${item.question_id || "-"}</span>
+								<span class="paper-tag">Data #${index + 1}</span>
+								<span class="chip">ID Data: ${item.question_id || "-"}</span>
 								<span class="chip">Level: ${item.level || "-"}</span>
 								<span class="chip">Kesulitan: ${item.difficulty || "-"}</span>
 							</div>
@@ -951,15 +951,15 @@
 
 		function handleSearch() {
 			if (!isUnlocked) {
-				renderMessage("Masukkan password untuk membuka data soal.");
+				renderMessage("Masukkan password untuk membuka bank data.");
 				return;
 			}
 
 			const keyword = keywordEl.value.trim();
 
 			if (!keyword) {
-				renderMessage("Ketik kata kunci untuk mulai mencari soal.");
-				metaEl.textContent = `Menampilkan hasil secara otomatis. Total bank soal: ${questionBank.length}.`;
+				renderMessage("Ketik kata kunci untuk mulai mencari data.");
+				metaEl.textContent = `Menampilkan hasil secara otomatis. Total bank data: ${questionBank.length}.`;
 				return;
 			}
 
@@ -970,7 +970,7 @@
 				.slice(0, MAX_RESULTS)
 				.map((entry) => entry.item);
 
-			metaEl.textContent = `Kata kunci: "${keyword}". Ditemukan ${filtered.length} soal (maksimal ${MAX_RESULTS} ditampilkan).`;
+			metaEl.textContent = `Kata kunci: "${keyword}". Ditemukan ${filtered.length} data (maksimal ${MAX_RESULTS} ditampilkan).`;
 			renderCards(filtered, keyword);
 		}
 
@@ -992,7 +992,7 @@
 				const plaintext = await decryptPayload(encryptedPayload, password);
 				const data = JSON.parse(plaintext);
 				if (!Array.isArray(data)) {
-					throw new Error("Data hasil dekripsi bukan array soal.");
+					throw new Error("Data hasil dekripsi bukan array data.");
 				}
 
 				questionBank = data;
