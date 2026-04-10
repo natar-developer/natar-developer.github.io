@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Natar Dev | Pixel Biorama Hub</title>
+    <link rel="icon" type="image/png" href="natar-dev.png">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -42,6 +43,13 @@
 
         /* Hero Section (Design 1) */
         header { margin-bottom: 60px; perspective: 1000px; transition: transform 0.1s ease-out; }
+        .brand-logo {
+            width: 96px;
+            height: 96px;
+            object-fit: contain;
+            margin-bottom: 16px;
+            filter: drop-shadow(0 8px 18px rgba(30, 41, 59, 0.18));
+        }
         h1 {
             font-size: 3.5rem; font-weight: 800; letter-spacing: -2px;
             text-transform: uppercase;
@@ -83,7 +91,8 @@
 
     <div class="container">
         <header id="hero">
-            <h1>NATAR HUB</h1>
+            <img src="natar-dev.png" alt="Natar Developer Logo" class="brand-logo">
+            <h1>NATAR-DEVELOPER HUB</h1>
             <p class="tagline">
                 Honestly, ini tuh basecamp-nya <b>Natar Developer</b> buat spill aplikasi sederhana kita. No ribet-ribet club, just simple apps with good vibes.
             </p>
@@ -92,9 +101,9 @@
         <main class="app-grid">
             <div class="app-card" data-tilt>
                 <span class="app-icon">🚀</span>
-                <h3>Project Alpha</h3>
-                <p class="description">Literally cuma tools simpel buat bantu daily task lo jadi lebih sat-set-sat-set.</p>
-                <a href="#" class="btn-launch">Open App</a>
+                <h3>Financial Goals Tracker</h3>
+                <p class="description">Tracker tujuan finansial biar budgeting, saving, dan target bulanan lebih rapi.</p>
+                <a href="apps/financial_goals_tracker.html" class="btn-launch">Open App</a>
             </div>
             <div class="app-card" data-tilt>
                 <span class="app-icon">🎮</span>
