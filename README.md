@@ -8,6 +8,7 @@ Project ini memakai file terenkripsi untuk data aplikasi:
 - Output terenkripsi (dipakai aplikasi): `apps/HoudinisNotebook/data.enc`
 - Script enkripsi: `scripts/encrypt-houdini-data.mjs`
 
+
 Halaman `apps/HoudinisNotebook/index.html` hanya membaca `data.enc` dan meminta password untuk dekripsi di browser.
 
 ---
